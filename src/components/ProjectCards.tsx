@@ -75,6 +75,7 @@ const statusConfig = {
 const trendIcons = { up: TrendingUp, down: TrendingDown, flat: Minus };
 
 export function ProjectCards() {
+  const navigate = useNavigate();
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {projects.map((p, i) => {
