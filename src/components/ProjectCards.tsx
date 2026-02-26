@@ -40,6 +40,7 @@ const projects = [
   },
   {
     name: "Design System 2.0",
+    slug: "design-system-2",
     status: "on-track" as const,
     progress: 92,
     risk: "low" as const,
