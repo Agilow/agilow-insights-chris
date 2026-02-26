@@ -114,13 +114,29 @@ export function ProjectCards() {
               </div>
             </div>
 
+            {/* Source indicators */}
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Effort: <span className="font-medium text-foreground">{p.effort}</span></span>
+              <div className="flex items-center gap-1">
+                <span className="text-muted-foreground mr-1">Sources:</span>
+                {p.sources.map((src) => {
+                  const S = sourceIcons[src];
+                  return (
+                    <span
+                      key={src}
+                      title={S.label}
+                      className="w-5 h-5 rounded bg-secondary flex items-center justify-center"
+                    >
+                      <S.icon className="w-3 h-3 text-accent" />
+                    </span>
+                  );
+                })}
+              </div>
               <span className="flex items-center gap-1">
                 <TrendIcon className="w-3.5 h-3.5" />
                 Velocity
               </span>
             </div>
+            <p className="text-[10px] text-muted-foreground mt-1.5">{p.signals}</p>
           </motion.div>
         );
       })}
