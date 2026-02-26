@@ -14,6 +14,7 @@ type SourceKey = keyof typeof sourceIcons;
 const projects = [
   {
     name: "Project Phoenix",
+    slug: "project-phoenix",
     status: "on-track" as const,
     progress: 78,
     risk: "low" as const,
