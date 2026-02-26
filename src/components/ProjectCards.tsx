@@ -1,6 +1,15 @@
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Minus, AlertTriangle, CheckCircle2, Clock, Hash, TicketCheck, Mail, Video } from "lucide-react";
 
+const sourceIcons = {
+  slack: { icon: Hash, label: "Slack" },
+  jira: { icon: TicketCheck, label: "Jira" },
+  email: { icon: Mail, label: "Email" },
+  meeting: { icon: Video, label: "Meetings" },
+};
+
+type SourceKey = keyof typeof sourceIcons;
+
 const projects = [
   {
     name: "Project Phoenix",
@@ -11,6 +20,8 @@ const projects = [
     dueIn: "12 days",
     trend: "up" as const,
     effort: "High",
+    sources: ["slack", "jira", "meeting"] as SourceKey[],
+    signals: "42 Slack threads · 18 Jira updates · 3 meetings",
   },
   {
     name: "API Migration v3",
@@ -21,6 +32,8 @@ const projects = [
     dueIn: "8 days",
     trend: "down" as const,
     effort: "Critical",
+    sources: ["slack", "jira", "email"] as SourceKey[],
+    signals: "67 Slack threads · 24 Jira updates · 8 emails",
   },
   {
     name: "Design System 2.0",
@@ -31,6 +44,8 @@ const projects = [
     dueIn: "3 days",
     trend: "up" as const,
     effort: "Medium",
+    sources: ["slack", "jira"] as SourceKey[],
+    signals: "12 Slack threads · 9 Jira updates",
   },
   {
     name: "Auth Overhaul",
@@ -41,6 +56,8 @@ const projects = [
     dueIn: "21 days",
     trend: "flat" as const,
     effort: "High",
+    sources: ["slack", "jira", "email", "meeting"] as SourceKey[],
+    signals: "31 Slack threads · 14 Jira updates · 5 emails · 2 meetings",
   },
 ];
 
