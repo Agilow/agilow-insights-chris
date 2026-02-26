@@ -53,6 +53,7 @@ const projects = [
   },
   {
     name: "Auth Overhaul",
+    slug: "auth-overhaul",
     status: "blocked" as const,
     progress: 33,
     risk: "medium" as const,
