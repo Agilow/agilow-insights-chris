@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Minus, AlertTriangle, CheckCircle2, Clock, Hash, TicketCheck, Mail, Video } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const sourceIcons = {
   slack: { icon: Hash, label: "Slack" },
