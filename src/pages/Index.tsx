@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Bell,
   Search,
@@ -8,6 +8,7 @@ import {
   Clock,
   Zap,
   ArrowUpRight,
+  ChevronDown,
 } from "lucide-react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ChatPanel } from "@/components/ChatPanel";
@@ -16,6 +17,7 @@ import { EffortChart } from "@/components/EffortChart";
 import { RiskAlerts } from "@/components/RiskAlerts";
 import { DecisionTimeline } from "@/components/DecisionTimeline";
 import { DataSourcesBanner } from "@/components/DataSourcesBanner";
+import { WorkflowIntegrations } from "@/components/WorkflowIntegrations";
 
 const stats = [
   { label: "Active Projects", value: "12", icon: Zap, change: "+2 this month" },
@@ -26,6 +28,7 @@ const stats = [
 
 const Index = () => {
   const [chatOpen, setChatOpen] = useState(false);
+  const [statsCollapsed, setStatsCollapsed] = useState(false);
 
   return (
     <div className="flex min-h-screen w-full">
@@ -72,26 +75,60 @@ const Index = () => {
           {/* Data Sources */}
           <DataSourcesBanner />
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {stats.map((s, i) => (
-              <motion.div
-                key={s.label}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.06 }}
-                className="glass-card p-4 flex items-start gap-3"
-              >
-                <div className="p-2 rounded-lg bg-accent/10">
-                  <s.icon className="w-5 h-5 text-accent" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground leading-none">{s.value}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
-                  <p className="text-[10px] text-muted-foreground">{s.change}</p>
-                </div>
-              </motion.div>
-            ))}
+          {/* Collapsible Stats */}
+          <div className="glass-card">
+            <button
+              onClick={() => setStatsCollapsed(!statsCollapsed)}
+              className="w-full flex items-center justify-between px-5 py-3 hover:bg-secondary/30 transition-colors rounded-t-xl"
+            >
+              <span className="text-sm font-semibold text-foreground">Portfolio Overview</span>
+              <div className="flex items-center gap-3">
+                {statsCollapsed && (
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    {stats.map((s) => (
+                      <span key={s.label} className="flex items-center gap-1">
+                        <s.icon className="w-3 h-3 text-accent" />
+                        <span className="font-semibold text-foreground">{s.value}</span>
+                        <span>{s.label}</span>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${statsCollapsed ? "" : "rotate-180"}`} />
+              </div>
+            </button>
+            <AnimatePresence initial={false}>
+              {!statsCollapsed && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 px-5 pb-5">
+                    {stats.map((s, i) => (
+                      <motion.div
+                        key={s.label}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.06 }}
+                        className="flex items-start gap-3 p-4 rounded-xl bg-secondary/40 border border-border/50"
+                      >
+                        <div className="p-2 rounded-lg bg-accent/10">
+                          <s.icon className="w-5 h-5 text-accent" />
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold text-foreground leading-none">{s.value}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+                          <p className="text-[10px] text-muted-foreground">{s.change}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Projects */}
@@ -108,6 +145,9 @@ const Index = () => {
 
           {/* Decision Timeline */}
           <DecisionTimeline />
+
+          {/* Workflow Integrations */}
+          <WorkflowIntegrations />
         </main>
       </div>
 
