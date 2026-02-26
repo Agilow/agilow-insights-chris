@@ -27,6 +27,7 @@ const projects = [
   },
   {
     name: "API Migration v3",
+    slug: "api-migration-v3",
     status: "at-risk" as const,
     progress: 45,
     risk: "high" as const,
