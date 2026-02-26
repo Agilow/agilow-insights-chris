@@ -38,12 +38,11 @@ export function AppSidebar() {
       )}
     >
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 h-16 border-b border-sidebar-border">
-        <img src={agilowIcon} alt="Agilow" className="w-8 h-8 rounded-md bg-primary-foreground p-0.5" />
-        {!collapsed && (
-          <span className="text-lg font-bold tracking-tight text-primary-foreground">
-            Agilow
-          </span>
+      <div className="flex items-center px-4 h-16 border-b border-sidebar-border">
+        {collapsed ? (
+          <img src={agilowIcon} alt="Agilow" className="w-8 h-8 rounded-md" />
+        ) : (
+          <img src={agilowLogo} alt="Agilow" className="h-8 object-contain" />
         )}
       </div>
 
