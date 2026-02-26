@@ -9,6 +9,7 @@ import Reports from "./pages/Reports";
 import Decisions from "./pages/Decisions";
 import Chat from "./pages/Chat";
 import Settings from "./pages/Settings";
+import ProjectDetail from "./pages/ProjectDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
