@@ -87,6 +87,7 @@ export function ProjectCards() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}
+            onClick={() => navigate(`/project/${p.slug}`)}
             className="glass-card p-5 hover:shadow-card transition-shadow cursor-pointer group"
           >
             <div className="flex items-start justify-between mb-3">
