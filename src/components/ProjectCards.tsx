@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Minus, AlertTriangle, CheckCircle2, Clock, Hash, TicketCheck, Mail, Video } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const sourceIcons = {
   slack: { icon: Hash, label: "Slack" },
@@ -13,6 +14,7 @@ type SourceKey = keyof typeof sourceIcons;
 const projects = [
   {
     name: "Project Phoenix",
+    slug: "project-phoenix",
     status: "on-track" as const,
     progress: 78,
     risk: "low" as const,
@@ -25,6 +27,7 @@ const projects = [
   },
   {
     name: "API Migration v3",
+    slug: "api-migration-v3",
     status: "at-risk" as const,
     progress: 45,
     risk: "high" as const,
@@ -37,6 +40,7 @@ const projects = [
   },
   {
     name: "Design System 2.0",
+    slug: "design-system-2",
     status: "on-track" as const,
     progress: 92,
     risk: "low" as const,
@@ -49,6 +53,7 @@ const projects = [
   },
   {
     name: "Auth Overhaul",
+    slug: "auth-overhaul",
     status: "blocked" as const,
     progress: 33,
     risk: "medium" as const,
@@ -70,6 +75,7 @@ const statusConfig = {
 const trendIcons = { up: TrendingUp, down: TrendingDown, flat: Minus };
 
 export function ProjectCards() {
+  const navigate = useNavigate();
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {projects.map((p, i) => {
@@ -81,6 +87,7 @@ export function ProjectCards() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}
+            onClick={() => navigate(`/project/${p.slug}`)}
             className="glass-card p-5 hover:shadow-card transition-shadow cursor-pointer group"
           >
             <div className="flex items-start justify-between mb-3">
