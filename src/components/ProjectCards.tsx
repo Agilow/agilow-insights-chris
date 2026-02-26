@@ -1,5 +1,14 @@
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Minus, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, AlertTriangle, CheckCircle2, Clock, Hash, TicketCheck, Mail, Video } from "lucide-react";
+
+const sourceIcons = {
+  slack: { icon: Hash, label: "Slack" },
+  jira: { icon: TicketCheck, label: "Jira" },
+  email: { icon: Mail, label: "Email" },
+  meeting: { icon: Video, label: "Meetings" },
+};
+
+type SourceKey = keyof typeof sourceIcons;
 
 const projects = [
   {
@@ -11,6 +20,8 @@ const projects = [
     dueIn: "12 days",
     trend: "up" as const,
     effort: "High",
+    sources: ["slack", "jira", "meeting"] as SourceKey[],
+    signals: "42 Slack threads · 18 Jira updates · 3 meetings",
   },
   {
     name: "API Migration v3",
@@ -21,6 +32,8 @@ const projects = [
     dueIn: "8 days",
     trend: "down" as const,
     effort: "Critical",
+    sources: ["slack", "jira", "email"] as SourceKey[],
+    signals: "67 Slack threads · 24 Jira updates · 8 emails",
   },
   {
     name: "Design System 2.0",
@@ -31,6 +44,8 @@ const projects = [
     dueIn: "3 days",
     trend: "up" as const,
     effort: "Medium",
+    sources: ["slack", "jira"] as SourceKey[],
+    signals: "12 Slack threads · 9 Jira updates",
   },
   {
     name: "Auth Overhaul",
@@ -41,6 +56,8 @@ const projects = [
     dueIn: "21 days",
     trend: "flat" as const,
     effort: "High",
+    sources: ["slack", "jira", "email", "meeting"] as SourceKey[],
+    signals: "31 Slack threads · 14 Jira updates · 5 emails · 2 meetings",
   },
 ];
 
@@ -97,13 +114,29 @@ export function ProjectCards() {
               </div>
             </div>
 
+            {/* Source indicators */}
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Effort: <span className="font-medium text-foreground">{p.effort}</span></span>
+              <div className="flex items-center gap-1">
+                <span className="text-muted-foreground mr-1">Sources:</span>
+                {p.sources.map((src) => {
+                  const S = sourceIcons[src];
+                  return (
+                    <span
+                      key={src}
+                      title={S.label}
+                      className="w-5 h-5 rounded bg-secondary flex items-center justify-center"
+                    >
+                      <S.icon className="w-3 h-3 text-accent" />
+                    </span>
+                  );
+                })}
+              </div>
               <span className="flex items-center gap-1">
                 <TrendIcon className="w-3.5 h-3.5" />
                 Velocity
               </span>
             </div>
+            <p className="text-[10px] text-muted-foreground mt-1.5">{p.signals}</p>
           </motion.div>
         );
       })}

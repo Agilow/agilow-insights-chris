@@ -15,6 +15,7 @@ import { ProjectCards } from "@/components/ProjectCards";
 import { EffortChart } from "@/components/EffortChart";
 import { RiskAlerts } from "@/components/RiskAlerts";
 import { DecisionTimeline } from "@/components/DecisionTimeline";
+import { DataSourcesBanner } from "@/components/DataSourcesBanner";
 
 const stats = [
   { label: "Active Projects", value: "12", icon: Zap, change: "+2 this month" },
@@ -67,6 +68,9 @@ const Index = () => {
               Here's your portfolio health overview — 3 alerts need attention.
             </p>
           </motion.div>
+
+          {/* Data Sources */}
+          <DataSourcesBanner />
 
           {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
