@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Layers,
 } from "lucide-react";
+import agilowLogo from "@/assets/agilow-logo-full.png";
 import agilowIcon from "@/assets/agilow-a-icon.png";
 import { cn } from "@/lib/utils";
 
