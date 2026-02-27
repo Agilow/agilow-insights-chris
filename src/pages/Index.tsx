@@ -16,7 +16,7 @@ import { ProjectCards } from "@/components/ProjectCards";
 import { EffortChart } from "@/components/EffortChart";
 import { RiskAlerts } from "@/components/RiskAlerts";
 import { DecisionTimeline } from "@/components/DecisionTimeline";
-import { DataSourcesBanner } from "@/components/DataSourcesBanner";
+
 import { WorkflowIntegrations } from "@/components/WorkflowIntegrations";
 
 const stats = [
