@@ -17,7 +17,7 @@ import { EffortChart } from "@/components/EffortChart";
 import { RiskAlerts } from "@/components/RiskAlerts";
 import { DecisionTimeline } from "@/components/DecisionTimeline";
 
-import { WorkflowIntegrations } from "@/components/WorkflowIntegrations";
+
 
 const stats = [
   { label: "Active Projects", value: "12", icon: Zap, change: "+2 this month" },
@@ -146,8 +146,6 @@ const Index = () => {
           {/* Decision Timeline */}
           <DecisionTimeline />
 
-          {/* Workflow Integrations */}
-          <WorkflowIntegrations />
         </main>
       </div>
 
