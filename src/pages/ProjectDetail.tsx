@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, CheckCircle2, AlertTriangle, Clock, TrendingUp, TrendingDown, Minus, Hash, TicketCheck, Mail, Video, Users, Calendar, GitBranch, Flag, AlertCircle, Info } from "lucide-react";
 import { AppSidebar } from "@/components/AppSidebar";
