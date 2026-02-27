@@ -16,7 +16,7 @@ import { ProjectCards } from "@/components/ProjectCards";
 import { EffortChart } from "@/components/EffortChart";
 import { RiskAlerts } from "@/components/RiskAlerts";
 import { DecisionTimeline } from "@/components/DecisionTimeline";
-import { DataSourcesBanner } from "@/components/DataSourcesBanner";
+
 import { WorkflowIntegrations } from "@/components/WorkflowIntegrations";
 
 const stats = [
@@ -72,8 +72,8 @@ const Index = () => {
             </p>
           </motion.div>
 
-          {/* Data Sources */}
-          <DataSourcesBanner />
+
+
 
           {/* Collapsible Stats */}
           <div className="glass-card">
