@@ -72,8 +72,8 @@ const Index = () => {
             </p>
           </motion.div>
 
-          {/* Data Sources */}
-          <DataSourcesBanner />
+
+
 
           {/* Collapsible Stats */}
           <div className="glass-card">
