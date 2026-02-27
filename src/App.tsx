@@ -29,6 +29,7 @@ const App = () => (
           <Route path="/chat" element={<Chat />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/project/:slug" element={<ProjectDetail />} />
+          <Route path="/sources" element={<SourceExplorer />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
