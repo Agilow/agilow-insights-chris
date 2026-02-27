@@ -1,6 +1,6 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, CheckCircle2, AlertTriangle, Clock, TrendingUp, TrendingDown, Minus, Hash, TicketCheck, Mail, Video, Users, Calendar, GitBranch, Flag, AlertCircle, Info } from "lucide-react";
+import { ArrowLeft, CheckCircle2, AlertTriangle, Clock, TrendingUp, TrendingDown, Minus, Hash, TicketCheck, Mail, Video, Users, Calendar, GitBranch, Flag, AlertCircle, Info, ExternalLink } from "lucide-react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
@@ -194,6 +194,7 @@ const severityColors = {
 
 const ProjectDetail = () => {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const project = projectsData[slug || ""];
 
   if (!project) {
@@ -280,18 +281,23 @@ const ProjectDetail = () => {
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {project.dataBreakdown.map((d) => (
-                <div key={d.source} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 border border-border/50">
-                  <div className="p-2 rounded-lg bg-background">
-                    {d.source === "Slack" && <Hash className="w-4 h-4 text-accent" />}
-                    {d.source === "Jira" && <TicketCheck className="w-4 h-4 text-accent" />}
-                    {d.source === "Email" && <Mail className="w-4 h-4 text-accent" />}
-                    {d.source === "Meetings" && <Video className="w-4 h-4 text-accent" />}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{d.source}</p>
-                    <p className="text-[11px] text-muted-foreground">{d.items} items · {d.lastActivity}</p>
-                  </div>
-                </div>
+                <div
+                  key={d.source}
+                  onClick={() => navigate(`/sources?source=${d.source.toLowerCase()}&project=${slug}`)}
+                  className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 border border-border/50 cursor-pointer hover:bg-secondary hover:shadow-soft transition-all group"
+                >
+                   <div className="p-2 rounded-lg bg-background">
+                     {d.source === "Slack" && <Hash className="w-4 h-4 text-accent" />}
+                     {d.source === "Jira" && <TicketCheck className="w-4 h-4 text-accent" />}
+                     {d.source === "Email" && <Mail className="w-4 h-4 text-accent" />}
+                     {d.source === "Meetings" && <Video className="w-4 h-4 text-accent" />}
+                   </div>
+                   <div className="flex-1">
+                     <p className="text-sm font-medium text-foreground group-hover:text-accent transition-colors">{d.source}</p>
+                     <p className="text-[11px] text-muted-foreground">{d.items} items · {d.lastActivity}</p>
+                   </div>
+                   <ExternalLink className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                 </div>
               ))}
             </div>
           </motion.div>
