@@ -146,8 +146,6 @@ const Index = () => {
           {/* Decision Timeline */}
           <DecisionTimeline />
 
-          {/* Workflow Integrations */}
-          <WorkflowIntegrations />
         </main>
       </div>
 
