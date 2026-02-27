@@ -194,6 +194,7 @@ const severityColors = {
 
 const ProjectDetail = () => {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const project = projectsData[slug || ""];
 
   if (!project) {
