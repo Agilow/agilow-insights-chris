@@ -68,7 +68,7 @@ const statusConfig = {
 const buildScheduleResponse = (): Message => ({
   id: (Date.now() + 1).toString(),
   role: "assistant",
-  content: "Based on completion % relative to elapsed time, **API Migration v3** is furthest behind — 45% complete with only 8 days remaining. Here are all active projects ordered by completion:",
+  content: "Based on completion relative to elapsed time, API Migration v3 is furthest behind — 45% complete with only 8 days remaining. Here are all active projects ordered by completion:",
   sources: [
     { type: "jira", label: "Jira board" },
     { type: "slack", label: "Slack #api-team" },
@@ -85,7 +85,7 @@ const buildScheduleResponse = (): Message => ({
 const buildRisksResponse = (): Message => ({
   id: (Date.now() + 1).toString(),
   role: "assistant",
-  content: "I found **3 critical/high-severity risks** across your portfolio right now:",
+  content: "I found 3 critical and high-severity risks across your portfolio right now:",
   sources: [
     { type: "slack", label: "Slack #api-team" },
     { type: "jira", label: "JIRA API-415, API-418" },
@@ -102,7 +102,7 @@ const buildDefaultResponse = (): Message => ({
   id: (Date.now() + 1).toString(),
   role: "assistant",
   content:
-    "Based on aggregated data from Slack, Jira, and recent meeting transcripts:\n\n**Project Phoenix** is on track at 78% — the last gate is load testing provisioning.\n\n**API Migration v3** is at risk — 3 teams are blocked on an auth endpoint due to outdated vendor docs.\n\nWould you like me to drill into any specific project?",
+    "Based on aggregated data from Slack, Jira, and recent meeting transcripts:\n\nProject Phoenix is on track at 78% — the last gate is load testing provisioning.\n\nAPI Migration v3 is at risk — 3 teams are blocked on an auth endpoint due to outdated vendor docs.\n\nWould you like me to drill into any specific project?",
   sources: [
     { type: "slack", label: "Slack #project-phoenix" },
     { type: "jira", label: "JIRA PHX-234" },

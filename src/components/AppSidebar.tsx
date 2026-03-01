@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import {
   LayoutDashboard,
-  History,
   MessageSquare,
   BarChart3,
   Settings,
@@ -16,7 +15,6 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { title: "Project Dashboard", icon: LayoutDashboard, path: "/" },
   { title: "Reports", icon: BarChart3, path: "/reports" },
-  { title: "Decisions", icon: History, path: "/decisions" },
   { title: "Chat", icon: MessageSquare, path: "/chat" },
 ];
 
