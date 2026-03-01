@@ -195,6 +195,7 @@ type SeverityFilter = "all" | RiskSeverity;
 const Index = () => {
   const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
+  const [healthCollapsed, setHealthCollapsed] = useState(false);
 
   // Project filters
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -217,7 +218,7 @@ const Index = () => {
     return true;
   });
 
-  const criticalCount = allRisks.filter((r) => r.severity === "critical" || r.severity === "high").length;
+  const criticalAndHighCount = allRisks.filter((r) => r.severity === "critical" || r.severity === "high").length;
 
   return (
     <div className="flex min-h-screen w-full">
@@ -255,106 +256,120 @@ const Index = () => {
           {/* Welcome */}
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-2xl font-bold text-foreground">Good morning, Elena</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {criticalCount} high-priority risks detected across your portfolio — early warning system active.
-            </p>
           </motion.div>
 
 
-          {/* ── Project Health ─────────────────────────────────────────────── */}
+          {/* ── Project Health Overview ───────────────────────────────────── */}
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">Project Health</h2>
-                <p className="text-xs text-muted-foreground">All projects · click to drill in</p>
+            {/* Collapsible header */}
+            <button
+              onClick={() => setHealthCollapsed(!healthCollapsed)}
+              className="w-full flex items-center justify-between mb-3 group"
+            >
+              <div className="text-left">
+                <h2 className="text-lg font-semibold text-foreground">Project Health Overview</h2>
+                <p className="text-xs text-muted-foreground">All projects · click any card to drill in</p>
               </div>
-            </div>
+              <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform ${healthCollapsed ? "-rotate-90" : ""}`} />
+            </button>
 
-            {/* Filters */}
-            <div className="flex items-center gap-2 flex-wrap mb-4">
-              <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
-              {(["all", "on-track", "at-risk", "blocked"] as StatusFilter[]).map((f) => (
-                <button key={f} onClick={() => setStatusFilter(f)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                    statusFilter === f ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-transparent hover:bg-secondary/70"
-                  }`}>
-                  {f === "all" ? "All" : statusConfig[f as ProjectStatus].label}
-                </button>
-              ))}
-              <div className="h-4 w-px bg-border mx-1" />
-              {(["all", "mine", "team"] as OwnershipFilter[]).map((f) => (
-                <button key={f} onClick={() => setOwnershipFilter(f)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                    ownershipFilter === f ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-transparent hover:bg-secondary/70"
-                  }`}>
-                  {f === "all" ? "All Ownership" : f === "mine" ? "My Projects" : "My Team"}
-                </button>
-              ))}
-            </div>
+            <AnimatePresence initial={false}>
+              {!healthCollapsed && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  {/* Filters */}
+                  <div className="flex items-center gap-2 flex-wrap mb-4">
+                    <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
+                    {(["all", "on-track", "at-risk", "blocked"] as StatusFilter[]).map((f) => (
+                      <button key={f} onClick={() => setStatusFilter(f)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                          statusFilter === f ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-transparent hover:bg-secondary/70"
+                        }`}>
+                        {f === "all" ? "All" : statusConfig[f as ProjectStatus].label}
+                      </button>
+                    ))}
+                    <div className="h-4 w-px bg-border mx-1" />
+                    {(["all", "mine", "team"] as OwnershipFilter[]).map((f) => (
+                      <button key={f} onClick={() => setOwnershipFilter(f)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                          ownershipFilter === f ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-transparent hover:bg-secondary/70"
+                        }`}>
+                        {f === "all" ? "All Ownership" : f === "mine" ? "My Projects" : "My Team"}
+                      </button>
+                    ))}
+                  </div>
 
-            {/* Project list */}
-            <div className="glass-card divide-y divide-border">
-              {filteredProjects.length === 0 && (
-                <div className="p-8 text-center text-sm text-muted-foreground">No projects match the current filters.</div>
-              )}
-              {filteredProjects.map((p, i) => {
-                const st = statusConfig[p.status];
-                const riskCount = allRisks.filter(r => r.projectSlug === p.slug && (r.severity === "critical" || r.severity === "high")).length;
-                return (
-                  <motion.div
-                    key={p.slug}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    onClick={() => navigate(`/project/${p.slug}`)}
-                    className="flex items-center gap-4 px-5 py-4 hover:bg-secondary/30 cursor-pointer group transition-colors"
-                  >
-                    {/* Status chip */}
-                    <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border shrink-0 w-[100px] justify-center ${st.chip}`}>
-                      <st.icon className="w-3 h-3" />{st.label}
-                    </span>
-
-                    {/* Name + meta */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground group-hover:text-accent transition-colors truncate">{p.name}</p>
-                      <div className="flex items-center gap-3 mt-0.5 text-[11px] text-muted-foreground">
-                        <span className="flex items-center gap-1"><Users className="w-3 h-3" />{p.team} members</span>
-                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />Due {p.dueDate}</span>
-                        <span className="hidden md:inline opacity-60">{p.signals}</span>
-                      </div>
-                    </div>
-
-                    {/* Progress */}
-                    <div className="w-40 shrink-0">
-                      <div className="flex items-center justify-between text-[11px] mb-1">
-                        <span className="text-muted-foreground">Progress</span>
-                        <span className="font-semibold text-foreground">{p.progress}%</span>
-                      </div>
-                      <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+                  {/* 2-column card grid */}
+                  {filteredProjects.length === 0 && (
+                    <div className="p-8 text-center text-sm text-muted-foreground glass-card">No projects match the current filters.</div>
+                  )}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {filteredProjects.map((p, i) => {
+                      const st = statusConfig[p.status];
+                      const riskCount = allRisks.filter(r => r.projectSlug === p.slug && (r.severity === "critical" || r.severity === "high")).length;
+                      return (
                         <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${p.progress}%` }}
-                          transition={{ duration: 0.8, delay: i * 0.05 }}
-                          className="h-full bg-accent rounded-full"
-                        />
-                      </div>
-                    </div>
+                          key={p.slug}
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          onClick={() => navigate(`/project/${p.slug}`)}
+                          className="glass-card p-5 hover:shadow-card cursor-pointer group transition-all"
+                        >
+                          {/* Card top row */}
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="min-w-0 flex-1 pr-3">
+                              <p className="text-base font-semibold text-foreground group-hover:text-accent transition-colors truncate">{p.name}</p>
+                              <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                                <span className="flex items-center gap-1"><Users className="w-3 h-3" />{p.team} members</span>
+                                <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />Due {p.dueDate}</span>
+                              </div>
+                            </div>
+                            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border shrink-0 ${st.chip}`}>
+                              <st.icon className="w-3 h-3" />{st.label}
+                            </span>
+                          </div>
 
-                    {/* Risk pill */}
-                    {riskCount > 0 && (
-                      <span className="hidden lg:inline-flex items-center gap-1 text-[10px] font-medium text-status-danger bg-status-danger/10 border border-status-danger/20 px-2 py-0.5 rounded-full shrink-0">
-                        <AlertTriangle className="w-2.5 h-2.5" />{riskCount} risk{riskCount > 1 ? "s" : ""}
-                      </span>
-                    )}
+                          {/* Progress */}
+                          <div className="mb-3">
+                            <div className="flex items-center justify-between text-xs mb-1.5">
+                              <span className="text-muted-foreground">Progress</span>
+                              <span className="font-semibold text-foreground">{p.progress}%</span>
+                            </div>
+                            <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${p.progress}%` }}
+                                transition={{ duration: 0.8, delay: i * 0.05 }}
+                                className="h-full bg-accent rounded-full"
+                              />
+                            </div>
+                          </div>
 
-                    {/* Last activity */}
-                    <span className="hidden xl:block text-[10px] text-muted-foreground shrink-0 w-20 text-right">{p.lastActivity}</span>
-
-                    <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 shrink-0 transition-opacity" />
-                  </motion.div>
-                );
-              })}
-            </div>
+                          {/* Footer */}
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span className="truncate opacity-70">{p.signals}</span>
+                            <div className="flex items-center gap-2 shrink-0 ml-2">
+                              {riskCount > 0 && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-status-danger bg-status-danger/10 border border-status-danger/20 px-2 py-0.5 rounded-full">
+                                  <AlertTriangle className="w-2.5 h-2.5" />{riskCount} risk{riskCount > 1 ? "s" : ""}
+                                </span>
+                              )}
+                              <span className="text-[10px] opacity-60">{p.lastActivity}</span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* ── Risk Overview & Alerts ────────────────────────────────────── */}
@@ -371,7 +386,7 @@ const Index = () => {
                     <Shield className="w-4 h-4 text-status-danger" />
                     <h3 className="font-semibold text-foreground">Risk Overview &amp; Alerts</h3>
                     <span className="text-[10px] font-medium text-status-danger bg-status-danger/10 border border-status-danger/20 px-2 py-0.5 rounded-full">
-                      {criticalCount} urgent
+                      {criticalAndHighCount} critical & high
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
