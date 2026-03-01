@@ -5,6 +5,7 @@ import {
   ArrowLeft, CheckCircle2, AlertTriangle, Clock, Hash, TicketCheck, Mail,
   Video, Users, Calendar, GitBranch, Flag, AlertCircle, Info, ExternalLink,
   Sparkles, Filter, ChevronDown, TrendingUp, TrendingDown, Minus,
+  ThumbsUp, ThumbsDown, Pencil, X, ChevronUp, Save,
 } from "lucide-react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -369,12 +370,214 @@ const riskSeverity = {
 
 type TimelineFilter = "all" | "decision" | "milestone" | "blocker" | "other";
 
+// ─── Risk inline feedback ──────────────────────────────────────────────────
+type FbState = "idle" | "up" | "down" | "submitted";
+function InlineRiskFeedback() {
+  const [state, setState] = useState<FbState>("idle");
+  const [text, setText] = useState("");
+  if (state === "submitted") return <span className="text-[10px] text-muted-foreground">Feedback saved.</span>;
+  if (state === "up") return <span className="text-[10px] text-muted-foreground">Thanks — noted.</span>;
+  return (
+    <div className="flex items-center gap-1">
+      {state === "idle" && (
+        <>
+          <button onClick={(e) => { e.stopPropagation(); setState("up"); }} className="p-0.5 rounded hover:bg-secondary transition-colors text-muted-foreground/40 hover:text-muted-foreground"><ThumbsUp className="w-3 h-3" /></button>
+          <button onClick={(e) => { e.stopPropagation(); setState("down"); }} className="p-0.5 rounded hover:bg-secondary transition-colors text-muted-foreground/40 hover:text-muted-foreground"><ThumbsDown className="w-3 h-3" /></button>
+        </>
+      )}
+      {state === "down" && (
+        <span className="text-[10px] text-muted-foreground italic">We'll review this risk.</span>
+      )}
+    </div>
+  );
+}
+
+// ─── Timeline edit modal ───────────────────────────────────────────────────
+type TimelineEntry = {
+  date: string; title: string; who: string; rationale: string;
+  flagged: boolean; sources: string[]; scopeChange: string;
+  entryType: string;
+};
+
+function TimelineEditModal({ entry, onSave, onClose }: {
+  entry: TimelineEntry;
+  onSave: (updated: TimelineEntry) => void;
+  onClose: () => void;
+}) {
+  const [form, setForm] = useState({ ...entry });
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        className="relative z-10 w-full max-w-lg bg-card border border-border rounded-2xl shadow-elevated p-6 mx-4"
+      >
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="font-semibold text-foreground">Edit Timeline Item</h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-secondary transition-colors"><X className="w-4 h-4 text-muted-foreground" /></button>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs font-medium text-foreground mb-1.5 block">Type</label>
+            <select
+              value={form.entryType}
+              onChange={(e) => setForm({ ...form, entryType: e.target.value })}
+              className="w-full text-sm bg-secondary border border-border rounded-lg px-3 py-2 text-foreground outline-none focus:border-accent/40"
+            >
+              {["decision", "milestone", "blocker", "other"].map(t => (
+                <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-foreground mb-1.5 block">Title</label>
+            <input
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              className="w-full text-sm bg-secondary border border-border rounded-lg px-3 py-2 text-foreground outline-none focus:border-accent/40"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-foreground mb-1.5 block">Description / Rationale</label>
+            <textarea
+              value={form.rationale}
+              onChange={(e) => setForm({ ...form, rationale: e.target.value })}
+              rows={3}
+              className="w-full text-sm bg-secondary border border-border rounded-lg px-3 py-2 text-foreground outline-none focus:border-accent/40 resize-none"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-foreground mb-1.5 block">Related Project</label>
+            <input value="This project" readOnly className="w-full text-sm bg-muted border border-border rounded-lg px-3 py-2 text-muted-foreground cursor-not-allowed" />
+          </div>
+          <p className="text-[10px] text-muted-foreground italic">Originally AI-detected from Slack / Jira / meetings / email.</p>
+        </div>
+
+        <div className="flex gap-2 mt-6">
+          <button
+            onClick={() => { onSave(form); onClose(); }}
+            className="flex-1 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+          >
+            Save changes
+          </button>
+          <button onClick={onClose} className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm hover:bg-secondary/70 transition-colors">
+            Cancel
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ─── Snapshot edit panel ───────────────────────────────────────────────────
+function SnapshotEditPanel({ snapshot, remainingSteps, estimatedCompletion, onSave, onClose }: {
+  snapshot: string;
+  remainingSteps: { label: string; est: string }[];
+  estimatedCompletion: string;
+  onSave: (snapshot: string, steps: { label: string; est: string }[]) => void;
+  onClose: () => void;
+}) {
+  const [text, setText] = useState(snapshot);
+  const [steps, setSteps] = useState(remainingSteps.map(s => ({ ...s })));
+
+  const moveStep = (i: number, dir: -1 | 1) => {
+    const next = [...steps];
+    const j = i + dir;
+    if (j < 0 || j >= next.length) return;
+    [next[i], next[j]] = [next[j], next[i]];
+    setSteps(next);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        className="relative z-10 w-full max-w-xl bg-card border border-border rounded-2xl shadow-elevated p-6 mx-4 max-h-[90vh] overflow-y-auto"
+      >
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="font-semibold text-foreground">Edit Current Snapshot</h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-secondary transition-colors"><X className="w-4 h-4 text-muted-foreground" /></button>
+        </div>
+
+        <div className="space-y-5">
+          <div>
+            <label className="text-xs font-medium text-foreground mb-1.5 block">Current Snapshot</label>
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={4}
+              className="w-full text-sm bg-secondary border border-border rounded-lg px-3 py-2.5 text-foreground outline-none focus:border-accent/40 resize-none leading-relaxed"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-foreground mb-2 block">Remaining Steps</label>
+            <div className="space-y-2">
+              {steps.map((step, i) => (
+                <div key={i} className="flex items-center gap-2 bg-secondary/50 border border-border rounded-lg px-3 py-2">
+                  <div className="flex flex-col gap-0.5">
+                    <button onClick={() => moveStep(i, -1)} className="p-0.5 hover:bg-secondary rounded transition-colors disabled:opacity-20" disabled={i === 0}>
+                      <ChevronUp className="w-3 h-3 text-muted-foreground" />
+                    </button>
+                    <button onClick={() => moveStep(i, 1)} className="p-0.5 hover:bg-secondary rounded transition-colors disabled:opacity-20" disabled={i === steps.length - 1}>
+                      <ChevronDown className="w-3 h-3 text-muted-foreground" />
+                    </button>
+                  </div>
+                  <input
+                    value={step.label}
+                    onChange={(e) => { const s = [...steps]; s[i] = { ...s[i], label: e.target.value }; setSteps(s); }}
+                    className="flex-1 text-sm bg-transparent text-foreground outline-none placeholder:text-muted-foreground"
+                  />
+                  <input
+                    value={step.est}
+                    onChange={(e) => { const s = [...steps]; s[i] = { ...s[i], est: e.target.value }; setSteps(s); }}
+                    className="w-20 text-xs bg-background border border-border rounded px-2 py-1 text-muted-foreground outline-none focus:border-accent/40 text-center"
+                    placeholder="e.g. 2 days"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-secondary/50 border border-border/50">
+            <Calendar className="w-3.5 h-3.5 text-accent shrink-0" />
+            <span className="text-xs text-muted-foreground">Estimated completion: </span>
+            <span className="text-xs font-semibold text-foreground">{estimatedCompletion}</span>
+          </div>
+        </div>
+
+        <div className="flex gap-2 mt-6">
+          <button onClick={() => { onSave(text, steps); onClose(); }} className="flex-1 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity">
+            Save
+          </button>
+          <button onClick={onClose} className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm hover:bg-secondary/70 transition-colors">
+            Cancel
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+
 const ProjectDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const project = projectsData[slug || ""];
   const [activeTab, setActiveTab] = useState<"overview" | "timeline" | "risks">("overview");
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
+  const [editingTimelineIdx, setEditingTimelineIdx] = useState<number | null>(null);
+  const [timelineEdits, setTimelineEdits] = useState<Record<number, Partial<TimelineEntry>>>({});
+  const [showSnapshotEdit, setShowSnapshotEdit] = useState(false);
+  const [snapshotText, setSnapshotText] = useState(project?.snapshot || "");
+  const [snapshotSteps, setSnapshotSteps] = useState(project?.remainingSteps || []);
+  const [snapshotLastEdited] = useState("Elena R. · 2 min ago");
 
   if (!project) {
     return (
@@ -394,7 +597,7 @@ const ProjectDetail = () => {
   const conf = confidenceConfig[project.confidence];
 
   // Build timeline entries from decisions + milestones + blockers
-  const timelineEntries = [
+  const baseTimelineEntries: TimelineEntry[] = [
     ...project.decisions.map(d => ({ ...d, entryType: d.type })),
     ...project.milestones.filter(m => m.done).map(m => ({
       date: m.date, title: m.label, who: "System", rationale: "Milestone completed.",
@@ -405,6 +608,10 @@ const ProjectDetail = () => {
       flagged: !b.resolved, sources: ["Slack", "Jira"], scopeChange: "Increased scope", entryType: "blocker" as const,
     })),
   ].sort((a, b) => new Date(b.date + " 2026").getTime() - new Date(a.date + " 2026").getTime());
+
+  const timelineEntries: TimelineEntry[] = baseTimelineEntries.map((e, i) =>
+    timelineEdits[i] ? { ...e, ...timelineEdits[i] } : e
+  );
 
   const filteredTimeline = timelineFilter === "all"
     ? timelineEntries
@@ -507,13 +714,21 @@ const ProjectDetail = () => {
                 <div className="lg:col-span-2 space-y-4">
                   {/* Current Snapshot */}
                   <div className="glass-card p-5">
-                    <h3 className="font-semibold text-foreground mb-2">Current Snapshot</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{project.snapshot}</p>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-foreground">Current Snapshot</h3>
+                      <button
+                        onClick={() => setShowSnapshotEdit(true)}
+                        className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-lg hover:bg-secondary"
+                      >
+                        <Pencil className="w-3 h-3" /> Edit snapshot
+                      </button>
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{snapshotText || project.snapshot}</p>
 
                     <div className="mt-4">
                       <p className="text-xs font-semibold text-foreground uppercase tracking-wide mb-2.5">Remaining Steps</p>
                       <ol className="space-y-2">
-                        {project.remainingSteps.map((step, i) => (
+                        {(snapshotSteps.length ? snapshotSteps : project.remainingSteps).map((step, i) => (
                           <li key={i} className="flex items-center gap-3 text-sm">
                             <span className="w-5 h-5 rounded-full bg-accent/10 text-accent text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
                             <span className="flex-1 text-foreground">{step.label}</span>
@@ -528,6 +743,7 @@ const ProjectDetail = () => {
                       <span className="text-xs text-muted-foreground">Estimated completion: </span>
                       <span className="text-xs font-semibold text-foreground">{project.estimatedCompletion}</span>
                     </div>
+                    <p className="text-[10px] text-muted-foreground/50 mt-2">Last edited by {snapshotLastEdited}</p>
                   </div>
 
                   {/* Project Objective */}
@@ -575,16 +791,17 @@ const ProjectDetail = () => {
                   {project.risks.length > 0 && (
                     <div className="glass-card p-5">
                       <h3 className="font-semibold text-foreground mb-3">Top Risks</h3>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {project.risks.map((r, i) => (
                           <div key={i} className="flex items-start gap-2">
                             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 mt-0.5 ${riskSeverity[r.severity]}`}>
                               {r.severity.charAt(0).toUpperCase() + r.severity.slice(1)}
                             </span>
-                            <div>
+                            <div className="flex-1 min-w-0">
                               <p className="text-xs text-foreground">{r.description}</p>
                               <p className="text-[10px] text-muted-foreground mt-0.5">{r.nextAction}</p>
                             </div>
+                            <InlineRiskFeedback />
                           </div>
                         ))}
                       </div>
@@ -703,6 +920,12 @@ const ProjectDetail = () => {
                                     <Flag className="w-2.5 h-2.5" /> Lesson Learned
                                   </span>
                                 )}
+                                <button
+                                  onClick={() => setEditingTimelineIdx(i)}
+                                  className="ml-auto text-[10px] text-muted-foreground/50 hover:text-muted-foreground flex items-center gap-0.5 transition-colors"
+                                >
+                                  <Pencil className="w-2.5 h-2.5" /> Edit
+                                </button>
                               </div>
                               <h4 className="text-sm font-medium text-foreground">{entry.title}</h4>
                               {entry.who && entry.who !== "System" && (
@@ -768,6 +991,33 @@ const ProjectDetail = () => {
           </AnimatePresence>
         </main>
       </div>
+
+      {/* Timeline edit modal */}
+      <AnimatePresence>
+        {editingTimelineIdx !== null && (
+          <TimelineEditModal
+            entry={filteredTimeline[editingTimelineIdx]}
+            onSave={(updated) => {
+              const globalIdx = timelineEntries.indexOf(filteredTimeline[editingTimelineIdx]);
+              setTimelineEdits(prev => ({ ...prev, [globalIdx !== -1 ? globalIdx : editingTimelineIdx]: updated }));
+            }}
+            onClose={() => setEditingTimelineIdx(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Snapshot edit panel */}
+      <AnimatePresence>
+        {showSnapshotEdit && (
+          <SnapshotEditPanel
+            snapshot={snapshotText || project.snapshot}
+            remainingSteps={snapshotSteps.length ? snapshotSteps : project.remainingSteps}
+            estimatedCompletion={project.estimatedCompletion}
+            onSave={(text, steps) => { setSnapshotText(text); setSnapshotSteps(steps); }}
+            onClose={() => setShowSnapshotEdit(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
