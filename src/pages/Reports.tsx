@@ -6,11 +6,6 @@ import {
   MessageSquare,
   Download,
   FileText,
-  Target,
-  TrendingUp,
-  BarChart3,
-  Users,
-  Shield,
   Sparkles,
   ChevronRight,
   Clock,
@@ -18,108 +13,27 @@ import {
   Plus,
   Filter,
   ArrowUpRight,
-  Lightbulb,
   Calendar,
 } from "lucide-react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ChatPanel } from "@/components/ChatPanel";
-
-type ReportType = {
-  id: string;
-  title: string;
-  description: string;
-  icon: React.ElementType;
-  category: "strategic" | "sprint" | "stakeholder" | "team";
-  estimatedTime: string;
-  lastGenerated?: string;
-  tags: string[];
-};
-
-const reportTypes: ReportType[] = [
-  {
-    id: "swot",
-    title: "SWOT Analysis",
-    description: "Strengths, weaknesses, opportunities, and threats across your portfolio based on sprint data, team signals, and market context.",
-    icon: Target,
-    category: "strategic",
-    estimatedTime: "~2 min",
-    lastGenerated: "3 days ago",
-    tags: ["Strategic", "Portfolio-wide"],
-  },
-  {
-    id: "sprint-retro",
-    title: "Sprint Retrospective",
-    description: "Auto-generated retro summary with velocity analysis, blockers, wins, and team sentiment pulled from Jira, Slack, and meeting transcripts.",
-    icon: TrendingUp,
-    category: "sprint",
-    estimatedTime: "~1 min",
-    lastGenerated: "1 day ago",
-    tags: ["Sprint", "Team"],
-  },
-  {
-    id: "sprint-goals",
-    title: "Sprint Goals & Planning",
-    description: "Recommended sprint goals based on backlog priority, team capacity, carryover items, and strategic alignment.",
-    icon: BarChart3,
-    category: "sprint",
-    estimatedTime: "~2 min",
-    tags: ["Sprint", "Planning"],
-  },
-  {
-    id: "exec-update",
-    title: "Executive Weekly Update",
-    description: "High-level portfolio summary for leadership — key metrics, milestone progress, risks, and decisions made this week.",
-    icon: ArrowUpRight,
-    category: "stakeholder",
-    estimatedTime: "~1 min",
-    lastGenerated: "5 days ago",
-    tags: ["Stakeholder", "Weekly"],
-  },
-  {
-    id: "progress-update",
-    title: "Progress Report",
-    description: "Detailed project-level progress with burndown, scope changes, dependency status, and timeline projections.",
-    icon: FileText,
-    category: "stakeholder",
-    estimatedTime: "~2 min",
-    lastGenerated: "2 days ago",
-    tags: ["Stakeholder", "Project"],
-  },
-  {
-    id: "team-health",
-    title: "Team Health Check",
-    description: "Workload distribution, overtime patterns, collaboration density, and morale indicators from Slack and calendar data.",
-    icon: Users,
-    category: "team",
-    estimatedTime: "~2 min",
-    tags: ["Team", "Wellbeing"],
-  },
-  {
-    id: "risk-assessment",
-    title: "Risk Assessment Report",
-    description: "Comprehensive risk register with probability, impact scoring, mitigation status, and early warning signals from integrated sources.",
-    icon: Shield,
-    category: "strategic",
-    estimatedTime: "~2 min",
-    lastGenerated: "1 week ago",
-    tags: ["Strategic", "Risk"],
-  },
-  {
-    id: "capacity-forecast",
-    title: "Capacity & Forecast",
-    description: "Forward-looking capacity model with hiring gaps, velocity projections, and delivery date estimates for active initiatives.",
-    icon: Lightbulb,
-    category: "team",
-    estimatedTime: "~3 min",
-    tags: ["Planning", "Forecast"],
-  },
-];
+import { ReportGenerator, REPORT_CONFIGS, type ReportConfig } from "@/components/ReportGenerator";
 
 const categoryLabels: Record<string, string> = {
   strategic: "Strategic",
   sprint: "Sprint & Delivery",
   stakeholder: "Stakeholder Updates",
   team: "Team & Capacity",
+};
+
+// Map report ids to categories for filter
+const reportCategories: Record<string, string> = {
+  "progress-update": "stakeholder",
+  "exec-update": "stakeholder",
+  "sprint-retro": "sprint",
+  "risk-assessment": "strategic",
+  "swot": "strategic",
+  "team-health": "team",
 };
 
 const categoryColors: Record<string, string> = {
@@ -129,39 +43,49 @@ const categoryColors: Record<string, string> = {
   team: "bg-status-warning/10 text-status-warning",
 };
 
+const estimatedTimes: Record<string, string> = {
+  "progress-update": "~2 min",
+  "exec-update": "~1 min",
+  "sprint-retro": "~1 min",
+  "risk-assessment": "~2 min",
+  "swot": "~2 min",
+  "team-health": "~2 min",
+};
+
+const lastGenerated: Record<string, string> = {
+  "exec-update": "5 days ago",
+  "sprint-retro": "1 day ago",
+  "progress-update": "2 days ago",
+  "swot": "3 days ago",
+};
+
 type GeneratedReport = {
   id: string;
   reportType: string;
   title: string;
   generatedAt: string;
-  status: "ready" | "generating";
   preview: string;
 };
 
 const recentReports: GeneratedReport[] = [
-  { id: "1", reportType: "exec-update", title: "Executive Weekly Update — Week of Feb 17", generatedAt: "Feb 22, 2026", status: "ready", preview: "Portfolio health: 3/5 projects on track. Key risk: Auth Overhaul delayed 1 week due to vendor dependency..." },
-  { id: "2", reportType: "sprint-retro", title: "Sprint 23 Retrospective", generatedAt: "Feb 21, 2026", status: "ready", preview: "Velocity: 45 pts delivered (97% hit rate). Top win: Phoenix UI migration completed ahead of schedule..." },
-  { id: "3", reportType: "swot", title: "Q1 Portfolio SWOT Analysis", generatedAt: "Feb 18, 2026", status: "ready", preview: "Strengths: High team velocity, strong cross-functional collaboration. Weaknesses: Single point of failure on auth..." },
-  { id: "4", reportType: "progress-update", title: "Project Phoenix — Progress Report", generatedAt: "Feb 20, 2026", status: "ready", preview: "Milestone: UI Migration 85% complete. Burndown on track. 2 dependencies resolved this week..." },
+  { id: "1", reportType: "exec-update", title: "Executive Weekly Update — Week of Feb 17", generatedAt: "Feb 22, 2026", preview: "Portfolio health: 3/5 projects on track. Key risk: Auth Overhaul delayed 1 week due to vendor dependency. Mobile App v2 ahead of schedule on two milestones." },
+  { id: "2", reportType: "sprint-retro", title: "Sprint 23 Retrospective — All Projects", generatedAt: "Feb 21, 2026", preview: "Aggregate velocity: 159 pts delivered (92% hit rate). Top win: Design System 2.0 component library published. Concern: Auth Overhaul team morale signals flagged." },
+  { id: "3", reportType: "swot", title: "Q1 Portfolio SWOT Analysis", generatedAt: "Feb 18, 2026", preview: "Strengths: High team velocity, strong cross-functional collaboration. Weaknesses: Single point of failure on auth. Threat: SSO vendor responsiveness." },
+  { id: "4", reportType: "progress-update", title: "Project Phoenix — Progress Report", generatedAt: "Feb 20, 2026", preview: "Milestone: UI Migration 85% complete. Sprint 24 delivered 45 pts (97% hit rate). Load testing environment 2 days behind — not yet critical." },
 ];
 
 const Reports = () => {
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [generatingReport, setGeneratingReport] = useState<string | null>(null);
+  const [activeReport, setActiveReport] = useState<ReportConfig | null>(null);
   const [showRecentReports, setShowRecentReports] = useState(true);
 
   const filteredReports = selectedCategory
-    ? reportTypes.filter((r) => r.category === selectedCategory)
-    : reportTypes;
-
-  const handleGenerate = (reportId: string) => {
-    setGeneratingReport(reportId);
-    setTimeout(() => setGeneratingReport(null), 3000);
-  };
+    ? REPORT_CONFIGS.filter((r) => reportCategories[r.id] === selectedCategory)
+    : REPORT_CONFIGS;
 
   const reportTypeIcon = (typeId: string) => {
-    const rt = reportTypes.find((r) => r.id === typeId);
+    const rt = REPORT_CONFIGS.find((r) => r.id === typeId);
     return rt ? rt.icon : FileText;
   };
 
@@ -201,7 +125,7 @@ const Reports = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Generate Reports</h1>
                 <p className="text-sm text-muted-foreground mt-1">
-                  AI-powered reports from your connected sources (Slack, Jira, meetings, email) — ready to export and share.
+                  AI-powered reports from your connected sources — Slack, Jira, meetings, email — ready to export and share.
                 </p>
               </div>
               <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent text-accent-foreground text-sm font-medium hover:opacity-90 transition-opacity">
@@ -237,70 +161,56 @@ const Reports = () => {
 
           {/* Report type cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredReports.map((report, i) => (
-              <motion.div
-                key={report.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.08 + i * 0.04 }}
-                className="glass-card p-5 group hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between">
+            {filteredReports.map((report, i) => {
+              const category = reportCategories[report.id] || "strategic";
+              return (
+                <motion.div
+                  key={report.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.08 + i * 0.04 }}
+                  className="glass-card p-5 group hover:shadow-md transition-shadow"
+                >
                   <div className="flex items-start gap-3">
-                    <div className={`p-2.5 rounded-xl ${categoryColors[report.category]}`}>
+                    <div className={`p-2.5 rounded-xl shrink-0 ${categoryColors[category]}`}>
                       <report.icon className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-foreground text-sm">{report.title}</h3>
-                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{report.description}</p>
-                      <div className="flex items-center gap-2 mt-3 flex-wrap">
-                        {report.tags.map((tag) => (
-                          <span key={tag} className="px-2 py-0.5 rounded-full bg-secondary text-[10px] font-medium text-muted-foreground">
-                            {tag}
-                          </span>
-                        ))}
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{report.promptLabel}</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${categoryColors[category]}`}>
+                          {categoryLabels[category]}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-secondary text-[10px] font-medium text-muted-foreground">
+                          {report.scope === "project" ? "Per project" : "Portfolio-wide"}
+                        </span>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
-                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> {report.estimatedTime}
-                    </span>
-                    {report.lastGenerated && (
+                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
+                    <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                       <span className="flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-status-success" /> Last: {report.lastGenerated}
+                        <Clock className="w-3 h-3" /> {estimatedTimes[report.id]}
                       </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleGenerate(report.id)}
-                      disabled={generatingReport === report.id}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                        generatingReport === report.id
-                          ? "bg-accent/10 text-accent cursor-wait"
-                          : "bg-accent text-accent-foreground hover:opacity-90"
-                      }`}
-                    >
-                      {generatingReport === report.id ? (
-                        <>
-                          <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                          Generating…
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-3.5 h-3.5" />
-                          Generate
-                        </>
+                      {lastGenerated[report.id] && (
+                        <span className="flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-status-success" /> Last: {lastGenerated[report.id]}
+                        </span>
                       )}
+                    </div>
+                    <button
+                      onClick={() => setActiveReport(report)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent text-accent-foreground text-xs font-medium hover:opacity-90 transition-opacity"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      Generate
                     </button>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
 
           {/* Recent generated reports */}
@@ -375,6 +285,16 @@ const Reports = () => {
           </motion.div>
         </main>
       </div>
+
+      {/* Report Generator Modal */}
+      <AnimatePresence>
+        {activeReport && (
+          <ReportGenerator
+            report={activeReport}
+            onClose={() => setActiveReport(null)}
+          />
+        )}
+      </AnimatePresence>
 
       <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} />
     </div>
