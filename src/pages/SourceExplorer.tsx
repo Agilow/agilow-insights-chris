@@ -345,6 +345,17 @@ const SourceExplorer = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState<SourceItem | null>(null);
 
+  // Map slug → the project label used in mockSources
+  const slugToProjectLabel: Record<string, string> = {
+    "project-phoenix": "Phoenix",
+    "api-migration-v3": "API Migration",
+    "design-system-2": "Design System",
+    "auth-overhaul": "Auth Overhaul",
+    "mobile-app-v2": "Mobile App v2",
+    "data-pipeline-refactor": "Data Pipeline",
+  };
+  const projectLabel = projectFilter ? slugToProjectLabel[projectFilter] ?? null : null;
+
   const filtered = mockSources.filter((item) => {
     const matchesType = activeFilter === "all" || item.type === activeFilter;
     const matchesSearch =
@@ -353,7 +364,7 @@ const SourceExplorer = () => {
       item.snippet.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.project.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesProject =
-      !projectFilter || item.project.toLowerCase().replace(/\s+/g, "-") === projectFilter;
+      !projectLabel || item.project.toLowerCase().includes(projectLabel.toLowerCase());
     return matchesType && matchesSearch && matchesProject;
   });
 
@@ -365,10 +376,10 @@ const SourceExplorer = () => {
           {/* Header */}
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
             <Link
-              to="/"
+              to={projectFilter ? `/project/${projectFilter}` : "/"}
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
             >
-              <ArrowLeft className="w-4 h-4" /> Back
+              <ArrowLeft className="w-4 h-4" /> {projectFilter ? "Back to Project" : "Back"}
             </Link>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-foreground">Source Explorer</h1>
