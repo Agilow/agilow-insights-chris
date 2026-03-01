@@ -7,12 +7,8 @@ import {
   AlertTriangle,
   CheckCircle2,
   Clock,
-  ChevronDown,
   Users,
   Calendar,
-  TrendingUp,
-  TrendingDown,
-  Minus,
   Hash,
   TicketCheck,
   Mail,
@@ -24,10 +20,10 @@ import {
   X,
   ArrowUpRight,
   Filter,
+  ChevronDown,
 } from "lucide-react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ChatPanel } from "@/components/ChatPanel";
-import { EffortChart } from "@/components/EffortChart";
 import { useNavigate } from "react-router-dom";
 
 // ─── Project Data ───────────────────────────────────────────────────────────
@@ -91,8 +87,6 @@ const statusConfig = {
   blocked: { label: "Blocked", icon: Clock, chip: "text-status-warning bg-status-warning/10 border-status-warning/20" },
 };
 
-const trendIcons = { up: TrendingUp, down: TrendingDown, flat: Minus };
-const trendColors = { up: "text-status-success", down: "text-status-danger", flat: "text-muted-foreground" };
 
 // ─── Risk Data ───────────────────────────────────────────────────────────────
 const allRisks = [
@@ -183,7 +177,6 @@ type SeverityFilter = "all" | RiskSeverity;
 const Index = () => {
   const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
-  const [statsCollapsed, setStatsCollapsed] = useState(true);
 
   // Project filters
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -249,50 +242,6 @@ const Index = () => {
             </p>
           </motion.div>
 
-          {/* Collapsed mini-stats */}
-          <div className="glass-card">
-            <button
-              onClick={() => setStatsCollapsed(!statsCollapsed)}
-              className="w-full flex items-center justify-between px-5 py-3 hover:bg-secondary/30 transition-colors rounded-xl"
-            >
-              <span className="text-sm font-semibold text-foreground">Portfolio Overview</span>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-status-success" /><span className="font-semibold text-foreground">{projects.filter(p=>p.status==="on-track").length}</span> On Track</span>
-                  <span className="flex items-center gap-1"><AlertTriangle className="w-3 h-3 text-status-danger" /><span className="font-semibold text-foreground">{projects.filter(p=>p.status==="at-risk").length}</span> At Risk</span>
-                  <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-status-warning" /><span className="font-semibold text-foreground">{projects.filter(p=>p.status==="blocked").length}</span> Blocked</span>
-                </div>
-                <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${statsCollapsed ? "" : "rotate-180"}`} />
-              </div>
-            </button>
-            <AnimatePresence initial={false}>
-              {!statsCollapsed && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
-                >
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 px-5 pb-5">
-                    {[
-                      { label: "Active Projects", value: projects.length.toString(), sub: "+2 this month" },
-                      { label: "Team Members", value: "34", sub: "3 squads" },
-                      { label: "Hours Saved", value: "47", sub: "This week" },
-                      { label: "Decisions Logged", value: "128", sub: "+14 this week" },
-                    ].map((s, i) => (
-                      <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                        className="p-4 rounded-xl bg-secondary/40 border border-border/50">
-                        <p className="text-2xl font-bold text-foreground">{s.value}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{s.label}</p>
-                        <p className="text-[10px] text-muted-foreground">{s.sub}</p>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
 
           {/* ── Project Health ─────────────────────────────────────────────── */}
           <div>
@@ -332,7 +281,6 @@ const Index = () => {
               )}
               {filteredProjects.map((p, i) => {
                 const st = statusConfig[p.status];
-                const TrendIcon = trendIcons[p.trend];
                 const riskCount = allRisks.filter(r => r.projectSlug === p.slug && (r.severity === "critical" || r.severity === "high")).length;
                 return (
                   <motion.div
@@ -372,12 +320,6 @@ const Index = () => {
                           className="h-full bg-accent rounded-full"
                         />
                       </div>
-                    </div>
-
-                    {/* Velocity */}
-                    <div className={`flex items-center gap-1 shrink-0 text-xs font-medium ${trendColors[p.trend]}`}>
-                      <TrendIcon className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Velocity</span>
                     </div>
 
                     {/* Risk pill */}
@@ -519,11 +461,6 @@ const Index = () => {
               </div>
           </motion.div>
 
-          {/* ── Additional Insights ───────────────────────────────────────── */}
-          <div>
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-3">Additional Insights</h2>
-            <EffortChart />
-          </div>
         </main>
       </div>
 
