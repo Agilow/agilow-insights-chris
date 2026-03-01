@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertTriangle, ArrowUpRight, Shield, Zap, X, Info, Hash, TicketCheck, Mail, Video, Lightbulb, ExternalLink } from "lucide-react";
+import { AlertTriangle, ArrowUpRight, Shield, Zap, X, Info, Hash, TicketCheck, Mail, Video, Lightbulb, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 const risks = [
@@ -78,6 +78,83 @@ const sourceIconMap: Record<string, React.ElementType> = {
   Meetings: Video,
 };
 
+type FeedbackState = "idle" | "thumbs-up" | "thumbs-down" | "submitted";
+
+function RiskFeedback({ riskIndex }: { riskIndex: number }) {
+  const [state, setState] = useState<FeedbackState>("idle");
+  const [text, setText] = useState("");
+
+  const handleUp = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setState("thumbs-up");
+  };
+  const handleDown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setState("thumbs-down");
+  };
+  const handleSubmit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setState("submitted");
+  };
+
+  if (state === "submitted") {
+    return (
+      <p className="text-[10px] text-muted-foreground mt-2 ml-6">Feedback saved.</p>
+    );
+  }
+  if (state === "thumbs-up") {
+    return (
+      <p className="text-[10px] text-muted-foreground mt-2 ml-6">Thanks — we'll use this to improve future alerts.</p>
+    );
+  }
+
+  return (
+    <div className="mt-2 ml-6" onClick={(e) => e.stopPropagation()}>
+      {state === "idle" && (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleUp}
+            className="p-1 rounded hover:bg-secondary transition-colors text-muted-foreground/50 hover:text-muted-foreground"
+            title="Accurate alert"
+          >
+            <ThumbsUp className="w-3 h-3" />
+          </button>
+          <button
+            onClick={handleDown}
+            className="p-1 rounded hover:bg-secondary transition-colors text-muted-foreground/50 hover:text-muted-foreground"
+            title="Not useful"
+          >
+            <ThumbsDown className="w-3 h-3" />
+          </button>
+        </div>
+      )}
+      {state === "thumbs-down" && (
+        <AnimatePresence>
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="flex items-center gap-2"
+          >
+            <input
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              placeholder="What's wrong with this alert? (optional)"
+              className="flex-1 text-[10px] bg-secondary border border-border rounded px-2 py-1 text-foreground placeholder:text-muted-foreground outline-none focus:border-accent/40"
+            />
+            <button
+              onClick={handleSubmit}
+              className="text-[10px] font-medium text-accent hover:underline shrink-0"
+            >
+              Submit
+            </button>
+          </motion.div>
+        </AnimatePresence>
+      )}
+    </div>
+  );
+}
+
 export function RiskAlerts() {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
@@ -115,11 +192,13 @@ export function RiskAlerts() {
                 </div>
                 <ArrowUpRight className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform ${expandedIndex === i ? "rotate-90" : ""}`} />
               </div>
-              <div className="mt-2 ml-6">
+              <div className="mt-2 ml-6 flex items-center justify-between">
                 <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
                   {risk.source}
                 </span>
               </div>
+              {/* Feedback */}
+              <RiskFeedback riskIndex={i} />
             </div>
 
             {/* Expanded Detail */}

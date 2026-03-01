@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Sparkles, ExternalLink, Bell, ChevronRight, AlertTriangle, CheckCircle2, Clock, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Send, Sparkles, ExternalLink, Bell, ChevronRight, AlertTriangle, CheckCircle2, Clock, TrendingUp, TrendingDown, Minus, ThumbsUp, ThumbsDown } from "lucide-react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useNavigate } from "react-router-dom";
 import agilowIcon from "@/assets/agilow-a-icon.png";
@@ -250,6 +250,42 @@ function pickResponse(text: string): Message {
   return buildDefaultResponse();
 }
 
+// ─── Message feedback ─────────────────────────────────────────────────────────
+type FbState = "idle" | "up" | "down" | "submitted";
+function MessageFeedback() {
+  const [state, setState] = useState<FbState>("idle");
+  const [text, setText] = useState("");
+  if (state === "submitted") return <p className="text-[10px] text-muted-foreground text-right mt-2">Feedback saved.</p>;
+  if (state === "up") return <p className="text-[10px] text-muted-foreground text-right mt-2">Thanks for the feedback.</p>;
+  return (
+    <div className="mt-2 pt-2 border-t border-border/30">
+      {state === "idle" && (
+        <div className="flex items-center justify-end gap-2">
+          <span className="text-[10px] text-muted-foreground/60">Was this helpful?</span>
+          <button onClick={() => setState("up")} className="p-1 rounded hover:bg-secondary transition-colors text-muted-foreground/40 hover:text-muted-foreground"><ThumbsUp className="w-3 h-3" /></button>
+          <button onClick={() => setState("down")} className="p-1 rounded hover:bg-secondary transition-colors text-muted-foreground/40 hover:text-muted-foreground"><ThumbsDown className="w-3 h-3" /></button>
+        </div>
+      )}
+      {state === "down" && (
+        <AnimatePresence>
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="space-y-1.5">
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="What was missing or wrong? (optional)"
+              rows={2}
+              className="w-full text-[11px] bg-secondary border border-border rounded-lg px-2.5 py-1.5 text-foreground placeholder:text-muted-foreground outline-none focus:border-accent/40 resize-none"
+            />
+            <div className="flex justify-end">
+              <button onClick={() => setState("submitted")} className="text-[10px] font-medium text-accent hover:underline">Submit</button>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      )}
+    </div>
+  );
+}
+
 // ─── Project visual card ──────────────────────────────────────────────────────
 function ProjectBar({ p, onClick }: { p: ProjectViz; onClick: () => void }) {
   const st = statusConfig[p.status];
@@ -360,6 +396,7 @@ const Chat = () => {
                             ))}
                           </div>
                         )}
+                        {msg.id !== "welcome" && <MessageFeedback />}
                       </div>
                       {/* Rich project visuals */}
                       {msg.projectVisuals && msg.projectVisuals.length > 0 && (
