@@ -68,7 +68,7 @@ const projectsData: Record<string, {
       { name: "Ryan C.", role: "QA" },
     ],
     sources: ["slack", "jira", "meeting"],
-    signals: "42 Slack threads · 18 Jira updates · 3 meetings",
+    signals: "3 Slack threads · 4 Jira updates · 2 meetings",
     snapshot: "Complete platform rebuild with new microservices architecture. Migration of legacy monolith to cloud-native services is progressing well — core API migration is complete and auth integration is done. Load testing remains the last major technical gate before production deploy.",
     remainingSteps: [
       { label: "Provision load testing environment", est: "1 day" },
@@ -99,9 +99,9 @@ const projectsData: Record<string, {
       { description: "Third-party payment SDK update may break integration", severity: "low", source: "Slack #phoenix-eng", nextAction: "Pin SDK version and monitor release notes" },
     ],
     dataBreakdown: [
-      { source: "Slack", items: 42, lastActivity: "2 min ago" },
-      { source: "Jira", items: 18, lastActivity: "12 min ago" },
-      { source: "Meetings", items: 3, lastActivity: "Yesterday" },
+      { source: "Slack", items: 3, lastActivity: "2 min ago" },
+      { source: "Jira", items: 4, lastActivity: "12 min ago" },
+      { source: "Meetings", items: 2, lastActivity: "Yesterday" },
     ],
   },
   "api-migration-v3": {
@@ -121,7 +121,7 @@ const projectsData: Record<string, {
       { name: "Lisa N.", role: "DevOps" },
     ],
     sources: ["slack", "jira", "email"],
-    signals: "67 Slack threads · 24 Jira updates · 8 emails",
+    signals: "3 Slack threads · 3 Jira updates · 3 emails",
     snapshot: "Migrating all public-facing APIs from REST v2 to GraphQL gateway. Schema design and gateway setup are complete, but endpoint migration is stalled — three downstream teams are blocked on an auth endpoint due to outdated vendor documentation.",
     remainingSteps: [
       { label: "Resolve vendor auth endpoint documentation gap", est: "2 days" },
@@ -150,9 +150,9 @@ const projectsData: Record<string, {
       { description: "Client SDK deadline conflicts with testing window", severity: "medium", source: "Email / PM sync", nextAction: "Negotiate SDK deadline with client team" },
     ],
     dataBreakdown: [
-      { source: "Slack", items: 67, lastActivity: "5 min ago" },
-      { source: "Jira", items: 24, lastActivity: "8 min ago" },
-      { source: "Email", items: 8, lastActivity: "1 hour ago" },
+      { source: "Slack", items: 3, lastActivity: "5 min ago" },
+      { source: "Jira", items: 3, lastActivity: "8 min ago" },
+      { source: "Email", items: 3, lastActivity: "1 hour ago" },
     ],
   },
   "design-system-2": {
@@ -171,7 +171,7 @@ const projectsData: Record<string, {
       { name: "Contractor", role: "Design Tokens" },
     ],
     sources: ["slack", "jira"],
-    signals: "12 Slack threads · 9 Jira updates",
+    signals: "2 Slack threads · 2 Jira updates",
     snapshot: "Unified design token library and component documentation is 92% complete. Remaining work is documentation polish and final sign-off from product leads before handoff to all teams.",
     remainingSteps: [
       { label: "Complete storybook documentation for 8 remaining components", est: "1 day" },
@@ -191,8 +191,8 @@ const projectsData: Record<string, {
     blockers: [],
     risks: [],
     dataBreakdown: [
-      { source: "Slack", items: 12, lastActivity: "20 min ago" },
-      { source: "Jira", items: 9, lastActivity: "1 hour ago" },
+      { source: "Slack", items: 2, lastActivity: "20 min ago" },
+      { source: "Jira", items: 2, lastActivity: "1 hour ago" },
     ],
   },
   "auth-overhaul": {
@@ -213,7 +213,7 @@ const projectsData: Record<string, {
       { name: "Legal Team", role: "Compliance" },
     ],
     sources: ["slack", "jira", "email", "meeting"],
-    signals: "31 Slack threads · 14 Jira updates · 5 emails · 2 meetings",
+    signals: "3 Slack threads · 2 Jira updates · 2 emails · 2 meetings",
     snapshot: "Complete overhaul of authentication system to support SSO, MFA, and new compliance requirements. SSO integration is blocked pending SSO provider's March API changes. A new GDPR requirement flagged by Legal may also require changes to token storage.",
     remainingSteps: [
       { label: "Resolve GDPR compliance approach with Legal", est: "3 days" },
@@ -242,9 +242,9 @@ const projectsData: Record<string, {
       { description: "SSO provider API changes scheduled for March", severity: "high", source: "Vendor notification email", nextAction: "Contact SSO vendor for migration guide" },
     ],
     dataBreakdown: [
-      { source: "Slack", items: 31, lastActivity: "15 min ago" },
-      { source: "Jira", items: 14, lastActivity: "30 min ago" },
-      { source: "Email", items: 5, lastActivity: "2 hours ago" },
+      { source: "Slack", items: 3, lastActivity: "15 min ago" },
+      { source: "Jira", items: 2, lastActivity: "30 min ago" },
+      { source: "Email", items: 2, lastActivity: "2 hours ago" },
       { source: "Meetings", items: 2, lastActivity: "Yesterday" },
     ],
   },
@@ -292,8 +292,9 @@ const projectsData: Record<string, {
       { description: "Accessibility audit deferred — post-launch remediation costs possible", severity: "low", source: "Email / PM", nextAction: "Budget for post-launch accessibility sprint" },
     ],
     dataBreakdown: [
-      { source: "Slack", items: 28, lastActivity: "1 hr ago" },
-      { source: "Jira", items: 16, lastActivity: "3 hrs ago" },
+      { source: "Slack", items: 2, lastActivity: "1 hr ago" },
+      { source: "Jira", items: 2, lastActivity: "3 hrs ago" },
+      { source: "Email", items: 1, lastActivity: "2 days ago" },
       { source: "Meetings", items: 1, lastActivity: "2 days ago" },
     ],
   },
@@ -343,9 +344,9 @@ const projectsData: Record<string, {
       { description: "Team needs 2 weeks Flink ramp-up before PoC", severity: "medium", source: "Meeting transcript", nextAction: "Evaluate contractor with Flink experience or managed Flink service" },
     ],
     dataBreakdown: [
-      { source: "Slack", items: 19, lastActivity: "3 days ago" },
-      { source: "Jira", items: 11, lastActivity: "3 days ago" },
-      { source: "Email", items: 4, lastActivity: "2 days ago" },
+      { source: "Slack", items: 2, lastActivity: "3 days ago" },
+      { source: "Jira", items: 2, lastActivity: "3 days ago" },
+      { source: "Email", items: 2, lastActivity: "2 days ago" },
     ],
   },
 };

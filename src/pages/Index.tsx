@@ -41,7 +41,7 @@ const baseProjects = [
     team: 6,
     owner: "Elena R.",
     lastActivity: "2 min ago",
-    signals: "42 Slack · 18 Jira · 3 meetings",
+    signals: "3 Slack · 4 Jira · 2 meetings",
   },
   {
     name: "API Migration v3",
@@ -52,7 +52,7 @@ const baseProjects = [
     team: 4,
     owner: "David P.",
     lastActivity: "5 min ago",
-    signals: "67 Slack · 24 Jira · 8 emails",
+    signals: "3 Slack · 3 Jira · 3 emails",
   },
   {
     name: "Design System 2.0",
@@ -63,7 +63,7 @@ const baseProjects = [
     team: 3,
     owner: "Sofia M.",
     lastActivity: "20 min ago",
-    signals: "12 Slack · 9 Jira",
+    signals: "2 Slack · 2 Jira",
   },
   {
     name: "Auth Overhaul",
@@ -74,7 +74,7 @@ const baseProjects = [
     team: 5,
     owner: "James K.",
     lastActivity: "15 min ago",
-    signals: "31 Slack · 14 Jira · 5 emails · 2 meetings",
+    signals: "3 Slack · 2 Jira · 2 emails · 2 meetings",
   },
   {
     name: "Mobile App v2",
@@ -85,7 +85,7 @@ const baseProjects = [
     team: 4,
     owner: "Jade K.",
     lastActivity: "1 hr ago",
-    signals: "28 Slack · 16 Jira · 1 meeting",
+    signals: "2 Slack · 2 Jira · 1 meeting",
   },
   {
     name: "Data Pipeline Refactor",
@@ -96,18 +96,48 @@ const baseProjects = [
     team: 3,
     owner: "Raj M.",
     lastActivity: "3 days ago",
-    signals: "19 Slack · 11 Jira · 4 emails",
+    signals: "2 Slack · 2 Jira · 2 emails",
   },
 ];
 
-// Updated data after a "refresh"
-const refreshedProjects = [
-  { ...baseProjects[0], progress: 81, lastActivity: "Just now", signals: "46 Slack · 20 Jira · 3 meetings" },
-  { ...baseProjects[1], progress: 47, lastActivity: "Just now", signals: "71 Slack · 26 Jira · 9 emails", status: "at-risk" as ProjectStatus },
-  { ...baseProjects[2], progress: 94, lastActivity: "Just now", signals: "13 Slack · 9 Jira" },
-  { ...baseProjects[3], progress: 33, lastActivity: "Just now", signals: "34 Slack · 15 Jira · 6 emails · 2 meetings" },
-  { ...baseProjects[4], progress: 64, lastActivity: "Just now", signals: "30 Slack · 17 Jira · 1 meeting" },
-  { ...baseProjects[5], progress: 30, lastActivity: "Just now", signals: "22 Slack · 12 Jira · 4 emails" },
+// Sequential sync states — each sync call cycles to the next state
+const syncStates = [
+  // Sync 1
+  [
+    { ...baseProjects[0], progress: 81, lastActivity: "Just now", signals: "6 Slack · 4 Jira · 2 meetings" },
+    { ...baseProjects[1], progress: 47, lastActivity: "Just now", signals: "7 Slack · 5 Jira · 3 emails", status: "at-risk" as ProjectStatus },
+    { ...baseProjects[2], progress: 94, lastActivity: "Just now", signals: "4 Slack · 3 Jira" },
+    { ...baseProjects[3], progress: 33, lastActivity: "Just now", signals: "5 Slack · 4 Jira · 3 emails · 2 meetings" },
+    { ...baseProjects[4], progress: 64, lastActivity: "Just now", signals: "5 Slack · 4 Jira · 1 meeting" },
+    { ...baseProjects[5], progress: 30, lastActivity: "Just now", signals: "4 Slack · 3 Jira · 3 emails" },
+  ],
+  // Sync 2 — minor forward progress
+  [
+    { ...baseProjects[0], progress: 83, lastActivity: "Just now", signals: "6 Slack · 4 Jira · 2 meetings" },
+    { ...baseProjects[1], progress: 48, lastActivity: "Just now", signals: "7 Slack · 5 Jira · 3 emails", status: "at-risk" as ProjectStatus },
+    { ...baseProjects[2], progress: 95, lastActivity: "Just now", signals: "4 Slack · 3 Jira" },
+    { ...baseProjects[3], progress: 35, lastActivity: "Just now", signals: "5 Slack · 4 Jira · 3 emails · 2 meetings" },
+    { ...baseProjects[4], progress: 66, lastActivity: "Just now", signals: "5 Slack · 4 Jira · 1 meeting" },
+    { ...baseProjects[5], progress: 31, lastActivity: "Just now", signals: "4 Slack · 3 Jira · 3 emails" },
+  ],
+  // Sync 3 — more progress, API Migration resolves slightly
+  [
+    { ...baseProjects[0], progress: 85, lastActivity: "Just now", signals: "6 Slack · 4 Jira · 2 meetings" },
+    { ...baseProjects[1], progress: 51, lastActivity: "Just now", signals: "7 Slack · 5 Jira · 3 emails", status: "at-risk" as ProjectStatus },
+    { ...baseProjects[2], progress: 96, lastActivity: "Just now", signals: "4 Slack · 3 Jira" },
+    { ...baseProjects[3], progress: 36, lastActivity: "Just now", signals: "5 Slack · 4 Jira · 3 emails · 2 meetings" },
+    { ...baseProjects[4], progress: 68, lastActivity: "Just now", signals: "5 Slack · 4 Jira · 1 meeting" },
+    { ...baseProjects[5], progress: 33, lastActivity: "Just now", signals: "4 Slack · 3 Jira · 3 emails" },
+  ],
+  // Sync 4 — Phoenix nearing done, Design System complete
+  [
+    { ...baseProjects[0], progress: 88, lastActivity: "Just now", signals: "6 Slack · 4 Jira · 2 meetings" },
+    { ...baseProjects[1], progress: 54, lastActivity: "Just now", signals: "7 Slack · 5 Jira · 3 emails", status: "at-risk" as ProjectStatus },
+    { ...baseProjects[2], progress: 98, lastActivity: "Just now", signals: "4 Slack · 3 Jira" },
+    { ...baseProjects[3], progress: 38, lastActivity: "Just now", signals: "5 Slack · 4 Jira · 3 emails · 2 meetings" },
+    { ...baseProjects[4], progress: 70, lastActivity: "Just now", signals: "5 Slack · 4 Jira · 1 meeting" },
+    { ...baseProjects[5], progress: 35, lastActivity: "Just now", signals: "4 Slack · 3 Jira · 3 emails" },
+  ],
 ];
 
 const statusConfig = {
@@ -224,13 +254,14 @@ const Index = () => {
   const [syncSteps, setSyncSteps] = useState<SyncStep[]>([]);
   const [projects, setProjects] = useState(baseProjects);
   const [lastSynced, setLastSynced] = useState<string | null>(null);
-  const [thinkingSeconds, setThinkingSeconds] = useState<number | null>(null);
+  const [thinkingDone, setThinkingDone] = useState(false);
+  const [syncCount, setSyncCount] = useState(0);
 
   const handleRefresh = async () => {
     if (isSyncing) return;
     setIsSyncing(true);
     setHealthCollapsed(false);
-    setThinkingSeconds(null);
+    setThinkingDone(false);
 
     const steps: Array<{ label: string; icon: React.ElementType }> = [
       { label: "Pulling from Jira…", icon: TicketCheck },
@@ -251,21 +282,19 @@ const Index = () => {
       })));
     }
 
-    // Simulate "thinking" countdown after connecting the dots
-    const thinkTime = Math.floor(Math.random() * 3) + 4; // 4–6 seconds
-    for (let t = thinkTime; t >= 1; t--) {
-      setThinkingSeconds(t);
-      await new Promise((res) => setTimeout(res, 1000));
-    }
-    setThinkingSeconds(0);
+    // Show static "thought for 8 seconds" — no countdown
+    await new Promise((res) => setTimeout(res, 8000));
+    setThinkingDone(true);
 
-    await new Promise((res) => setTimeout(res, 300));
-    setProjects(refreshedProjects);
+    await new Promise((res) => setTimeout(res, 400));
+    const nextSyncIndex = syncCount % syncStates.length;
+    setProjects(syncStates[nextSyncIndex]);
+    setSyncCount((c) => c + 1);
     setLastSynced("Just now");
 
-    await new Promise((res) => setTimeout(res, 1200));
+    await new Promise((res) => setTimeout(res, 1500));
     setSyncSteps([]);
-    setThinkingSeconds(null);
+    setThinkingDone(false);
     setIsSyncing(false);
   };
 
@@ -374,17 +403,19 @@ const Index = () => {
                       </div>
                     );
                   })}
-                  {thinkingSeconds !== null && thinkingSeconds > 0 && (
+                  {isSyncing && syncSteps.every(s => s.done) && !thinkingDone && (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       className="flex items-center gap-1.5 text-xs text-accent font-medium ml-2 border border-accent/20 bg-accent/5 px-2.5 py-1 rounded-full"
                     >
-                      <Zap className="w-3 h-3" />
-                      Thinking… {thinkingSeconds}s
+                      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}>
+                        <Zap className="w-3 h-3" />
+                      </motion.div>
+                      Thought for 8 seconds…
                     </motion.div>
                   )}
-                  {thinkingSeconds === 0 && (
+                  {thinkingDone && (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
