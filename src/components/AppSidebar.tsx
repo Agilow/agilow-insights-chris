@@ -8,15 +8,13 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Layers,
 } from "lucide-react";
 import agilowLogo from "@/assets/agilow-logo-full.png";
 import agilowIcon from "@/assets/agilow-a-icon.png";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { title: "Dashboard", icon: LayoutDashboard, path: "/" },
-  { title: "Projects", icon: Layers, path: "/projects" },
+  { title: "Project Dashboard", icon: LayoutDashboard, path: "/" },
   { title: "Reports", icon: BarChart3, path: "/reports" },
   { title: "Decisions", icon: History, path: "/decisions" },
   { title: "Chat", icon: MessageSquare, path: "/chat" },
