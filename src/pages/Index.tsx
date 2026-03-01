@@ -39,7 +39,6 @@ const projects = [
     dueDate: "Mar 10, 2026",
     team: 6,
     owner: "Elena R.",
-    trend: "up" as const,
     lastActivity: "2 min ago",
     signals: "42 Slack · 18 Jira · 3 meetings",
   },
@@ -51,7 +50,6 @@ const projects = [
     dueDate: "Mar 3, 2026",
     team: 4,
     owner: "David P.",
-    trend: "down" as const,
     lastActivity: "5 min ago",
     signals: "67 Slack · 24 Jira · 8 emails",
   },
@@ -63,7 +61,6 @@ const projects = [
     dueDate: "Feb 28, 2026",
     team: 3,
     owner: "Sofia M.",
-    trend: "up" as const,
     lastActivity: "20 min ago",
     signals: "12 Slack · 9 Jira",
   },
@@ -75,9 +72,30 @@ const projects = [
     dueDate: "Mar 20, 2026",
     team: 5,
     owner: "James K.",
-    trend: "flat" as const,
     lastActivity: "15 min ago",
     signals: "31 Slack · 14 Jira · 5 emails · 2 meetings",
+  },
+  {
+    name: "Mobile App v2",
+    slug: "mobile-app-v2",
+    status: "on-track" as ProjectStatus,
+    progress: 61,
+    dueDate: "Apr 5, 2026",
+    team: 4,
+    owner: "Jade K.",
+    lastActivity: "1 hr ago",
+    signals: "28 Slack · 16 Jira · 1 meeting",
+  },
+  {
+    name: "Data Pipeline Refactor",
+    slug: "data-pipeline-refactor",
+    status: "at-risk" as ProjectStatus,
+    progress: 28,
+    dueDate: "Mar 28, 2026",
+    team: 3,
+    owner: "Raj M.",
+    lastActivity: "3 days ago",
+    signals: "19 Slack · 11 Jira · 4 emails",
   },
 ];
 
@@ -307,8 +325,8 @@ const Index = () => {
                     </div>
 
                     {/* Progress */}
-                    <div className="w-36 shrink-0">
-                      <div className="flex justify-between text-[11px] mb-1">
+                    <div className="w-40 shrink-0">
+                      <div className="flex items-center justify-between text-[11px] mb-1">
                         <span className="text-muted-foreground">Progress</span>
                         <span className="font-semibold text-foreground">{p.progress}%</span>
                       </div>
