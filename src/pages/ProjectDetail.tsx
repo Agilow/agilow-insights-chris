@@ -7,7 +7,7 @@ import {
   Sparkles, Filter, ChevronDown, TrendingUp, TrendingDown, Minus,
   ThumbsUp, ThumbsDown, Pencil, X, ChevronUp, Save,
 } from "lucide-react";
-import { AppSidebar } from "@/components/AppSidebar";
+import { AppSidebar, MobileMenuButton } from "@/components/AppSidebar";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 const sourceIcons = {
@@ -621,7 +621,12 @@ const ProjectDetail = () => {
     <div className="flex min-h-screen w-full">
       <AppSidebar />
       <div className="flex-1 flex flex-col min-w-0">
-        <main className="flex-1 p-6 max-w-[1400px]">
+        {/* Mobile header */}
+        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border h-16 flex items-center px-3 gap-2 md:hidden">
+          <MobileMenuButton />
+          <span className="text-sm font-semibold text-foreground truncate">{project.name}</span>
+        </header>
+        <main className="flex-1 p-3 sm:p-6 max-w-[1400px]">
           {/* Back */}
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-5">
             <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5">
@@ -629,8 +634,8 @@ const ProjectDetail = () => {
             </Link>
 
             {/* Top header card */}
-            <div className="glass-card p-6">
-              <div className="flex items-start justify-between gap-4">
+            <div className="glass-card p-4 sm:p-6">
+              <div className="flex items-start justify-between gap-3 flex-wrap sm:flex-nowrap">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 flex-wrap mb-2">
                     <h1 className="text-2xl font-bold text-foreground">{project.name}</h1>

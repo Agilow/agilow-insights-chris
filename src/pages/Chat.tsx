@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Sparkles, ExternalLink, Bell, ChevronRight, AlertTriangle, CheckCircle2, Clock, TrendingUp, TrendingDown, Minus, ThumbsUp, ThumbsDown } from "lucide-react";
-import { AppSidebar } from "@/components/AppSidebar";
+import { AppSidebar, MobileMenuButton } from "@/components/AppSidebar";
 import { useNavigate } from "react-router-dom";
 import agilowIcon from "@/assets/agilow-a-icon.png";
 
@@ -361,27 +361,28 @@ const Chat = () => {
       <div className="flex-1 flex min-w-0">
         {/* Chat area */}
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border h-16 flex items-center justify-between px-6">
-            <div className="flex items-center gap-3">
-              <img src={agilowIcon} alt="" className="w-7 h-7 rounded-md bg-primary p-0.5" />
-              <div>
-                <h2 className="text-sm font-bold text-foreground">Ask Workspace</h2>
-                <p className="text-xs text-muted-foreground">Query all project data in natural language</p>
+          <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border h-16 flex items-center justify-between px-3 sm:px-6 gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <MobileMenuButton />
+              <img src={agilowIcon} alt="" className="w-7 h-7 rounded-md bg-primary p-0.5 shrink-0" />
+              <div className="min-w-0">
+                <h2 className="text-sm font-bold text-foreground truncate">Ask Workspace</h2>
+                <p className="text-xs text-muted-foreground hidden sm:block">Query all project data in natural language</p>
               </div>
             </div>
-            <button className="p-2 rounded-lg hover:bg-secondary transition-colors">
+            <button className="p-2 rounded-lg hover:bg-secondary transition-colors shrink-0">
               <Bell className="w-5 h-5 text-muted-foreground" />
             </button>
           </header>
 
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4">
             {messages.map((msg) => (
               <motion.div key={msg.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                 className={msg.role === "user" ? "flex justify-end" : "flex justify-start"}>
                 {msg.role === "assistant" && (
                   <img src={agilowIcon} alt="" className="w-7 h-7 rounded-md bg-primary p-0.5 mr-2 self-start mt-1 shrink-0" />
                 )}
-                <div className={`max-w-[80%] ${msg.role === "user" ? "bg-primary text-primary-foreground rounded-2xl rounded-br-md px-4 py-3 text-sm" : ""}`}>
+                <div className={`max-w-[90%] sm:max-w-[80%] ${msg.role === "user" ? "bg-primary text-primary-foreground rounded-2xl rounded-br-md px-4 py-3 text-sm" : ""}`}>
                   {msg.role === "assistant" ? (
                     <div className="space-y-3">
                       <div className="bg-card border border-border text-card-foreground rounded-2xl rounded-bl-md px-4 py-3 text-sm shadow-soft">
