@@ -201,7 +201,7 @@ const Reports = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Generate Reports</h1>
                 <p className="text-sm text-muted-foreground mt-1">
-                  AI-powered reports from your connected sources — ready to export and share
+                  AI-powered reports from your connected sources (Slack, Jira, meetings, email) — ready to export and share.
                 </p>
               </div>
               <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent text-accent-foreground text-sm font-medium hover:opacity-90 transition-opacity">

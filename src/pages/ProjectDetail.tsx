@@ -352,6 +352,9 @@ const ProjectDetail = () => {
                       </div>
                       <span className="text-sm font-bold text-foreground shrink-0">{project.progress}%</span>
                     </div>
+                    <p className="text-[11px] text-muted-foreground mt-1">
+                      {project.remainingSteps.length} steps remaining · Estimated completion: <span className="font-medium text-foreground">{project.estimatedCompletion}</span>
+                    </p>
                   </div>
                 </div>
 
@@ -535,9 +538,9 @@ const ProjectDetail = () => {
                   <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
                     <div>
                       <h3 className="font-semibold text-foreground">Project Timeline</h3>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
                         <Sparkles className="w-3 h-3 text-accent" />
-                        Generated from connected sources — meeting notes, Slack, and Jira tickets
+                        Generated from connected sources — meeting notes, Slack, Jira tickets, email threads.
                       </p>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
