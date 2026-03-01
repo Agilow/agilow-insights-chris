@@ -21,6 +21,7 @@ import {
   ArrowUpRight,
   Filter,
   ChevronDown,
+  RefreshCw,
 } from "lucide-react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ChatPanel } from "@/components/ChatPanel";
@@ -30,7 +31,7 @@ import { useNavigate } from "react-router-dom";
 type ProjectStatus = "on-track" | "at-risk" | "blocked";
 type RiskSeverity = "critical" | "high" | "medium" | "low";
 
-const projects = [
+const baseProjects = [
   {
     name: "Project Phoenix",
     slug: "project-phoenix",
@@ -99,12 +100,21 @@ const projects = [
   },
 ];
 
+// Updated data after a "refresh"
+const refreshedProjects = [
+  { ...baseProjects[0], progress: 81, lastActivity: "Just now", signals: "46 Slack · 20 Jira · 3 meetings" },
+  { ...baseProjects[1], progress: 47, lastActivity: "Just now", signals: "71 Slack · 26 Jira · 9 emails", status: "at-risk" as ProjectStatus },
+  { ...baseProjects[2], progress: 94, lastActivity: "Just now", signals: "13 Slack · 9 Jira" },
+  { ...baseProjects[3], progress: 33, lastActivity: "Just now", signals: "34 Slack · 15 Jira · 6 emails · 2 meetings" },
+  { ...baseProjects[4], progress: 64, lastActivity: "Just now", signals: "30 Slack · 17 Jira · 1 meeting" },
+  { ...baseProjects[5], progress: 30, lastActivity: "Just now", signals: "22 Slack · 12 Jira · 4 emails" },
+];
+
 const statusConfig = {
   "on-track": { label: "On Track", icon: CheckCircle2, chip: "text-status-success bg-status-success/10 border-status-success/20" },
   "at-risk": { label: "At Risk", icon: AlertTriangle, chip: "text-status-danger bg-status-danger/10 border-status-danger/20" },
   blocked: { label: "Blocked", icon: Clock, chip: "text-status-warning bg-status-warning/10 border-status-warning/20" },
 };
-
 
 // ─── Risk Data ───────────────────────────────────────────────────────────────
 const allRisks = [
@@ -187,6 +197,8 @@ const sourceIconMap: Record<string, React.ElementType> = {
   Slack: Hash, Jira: TicketCheck, Email: Mail, Meetings: Video,
 };
 
+type SyncStep = { label: string; icon: React.ElementType; done: boolean; active: boolean };
+
 // ─── Component ───────────────────────────────────────────────────────────────
 type StatusFilter = "all" | ProjectStatus;
 type OwnershipFilter = "all" | "mine" | "team";
@@ -196,6 +208,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
   const [healthCollapsed, setHealthCollapsed] = useState(false);
+  const [riskCollapsed, setRiskCollapsed] = useState(false);
 
   // Project filters
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -205,6 +218,44 @@ const Index = () => {
   const [riskSeverity, setRiskSeverity] = useState<SeverityFilter>("all");
   const [riskProject, setRiskProject] = useState<string>("all");
   const [expandedRisk, setExpandedRisk] = useState<number | null>(null);
+
+  // Refresh state
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncSteps, setSyncSteps] = useState<SyncStep[]>([]);
+  const [projects, setProjects] = useState(baseProjects);
+  const [lastSynced, setLastSynced] = useState<string | null>(null);
+
+  const handleRefresh = async () => {
+    if (isSyncing) return;
+    setIsSyncing(true);
+    setHealthCollapsed(false);
+
+    const steps: Array<{ label: string; icon: React.ElementType }> = [
+      { label: "Pulling from Jira…", icon: TicketCheck },
+      { label: "Pulling from Slack…", icon: Hash },
+      { label: "Scanning emails…", icon: Mail },
+      { label: "Connecting the dots…", icon: Zap },
+    ];
+
+    setSyncSteps(steps.map((s, i) => ({ ...s, done: false, active: i === 0 })));
+
+    for (let i = 0; i < steps.length; i++) {
+      await new Promise((res) => setTimeout(res, 900));
+      setSyncSteps(steps.map((s, j) => ({
+        ...s,
+        done: j < i + 1,
+        active: j === i + 1,
+      })));
+    }
+
+    await new Promise((res) => setTimeout(res, 400));
+    setProjects(refreshedProjects);
+    setLastSynced("Just now");
+
+    await new Promise((res) => setTimeout(res, 1200));
+    setSyncSteps([]);
+    setIsSyncing(false);
+  };
 
   const filteredProjects = projects.filter((p) => {
     if (statusFilter !== "all" && p.status !== statusFilter) return false;
@@ -237,6 +288,30 @@ const Index = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Refresh button */}
+            <div className="flex items-center gap-2">
+              {lastSynced && !isSyncing && (
+                <span className="text-[10px] text-muted-foreground hidden sm:inline">Synced {lastSynced}</span>
+              )}
+              <button
+                onClick={handleRefresh}
+                disabled={isSyncing}
+                title="Sync from Jira, Slack & Email"
+                className="p-2 rounded-lg hover:bg-secondary transition-colors disabled:opacity-60 relative group"
+              >
+                <motion.div
+                  animate={isSyncing ? { rotate: 360 } : { rotate: 0 }}
+                  transition={isSyncing ? { repeat: Infinity, duration: 1, ease: "linear" } : { duration: 0.3 }}
+                >
+                  <RefreshCw className="w-4 h-4 text-accent" />
+                </motion.div>
+                {!isSyncing && (
+                  <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-[10px] bg-popover border border-border text-muted-foreground px-2 py-0.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                    Sync data
+                  </span>
+                )}
+              </button>
+            </div>
             <button className="p-2 rounded-lg hover:bg-secondary transition-colors relative">
               <Bell className="w-5 h-5 text-muted-foreground" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-destructive" />
@@ -254,10 +329,43 @@ const Index = () => {
         {/* Main content */}
         <main className="flex-1 p-6 space-y-6 max-w-[1400px]">
           {/* Welcome */}
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-foreground">Good morning, Elena</h1>
           </motion.div>
 
+          {/* ── Sync progress overlay ─────────────────────────────────────── */}
+          <AnimatePresence>
+            {syncSteps.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                className="glass-card p-4 border border-accent/20"
+              >
+                <div className="flex items-center gap-3 flex-wrap">
+                  {syncSteps.map((step, i) => {
+                    const Icon = step.icon;
+                    return (
+                      <div key={i} className={`flex items-center gap-1.5 text-xs transition-all duration-300 ${step.done ? "text-status-success" : step.active ? "text-accent" : "text-muted-foreground opacity-40"}`}>
+                        {step.done ? (
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                        ) : step.active ? (
+                          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}>
+                            <RefreshCw className="w-3.5 h-3.5" />
+                          </motion.div>
+                        ) : (
+                          <Icon className="w-3.5 h-3.5" />
+                        )}
+                        <span className="font-medium">{step.label.replace("…", step.done ? " ✓" : step.active ? "…" : "")}</span>
+                        {i < syncSteps.length - 1 && <span className="mx-1 text-border">→</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* ── Project Health Overview ───────────────────────────────────── */}
           <div>
@@ -339,11 +447,18 @@ const Index = () => {
                           <div className="mb-3">
                             <div className="flex items-center justify-between text-xs mb-1.5">
                               <span className="text-muted-foreground">Progress</span>
-                              <span className="font-semibold text-foreground">{p.progress}%</span>
+                              <motion.span
+                                key={p.progress}
+                                initial={{ scale: 1.2, color: "hsl(var(--accent))" }}
+                                animate={{ scale: 1, color: "hsl(var(--foreground))" }}
+                                transition={{ duration: 0.5 }}
+                                className="font-semibold"
+                              >
+                                {p.progress}%
+                              </motion.span>
                             </div>
                             <div className="h-2 bg-secondary rounded-full overflow-hidden">
                               <motion.div
-                                initial={{ width: 0 }}
                                 animate={{ width: `${p.progress}%` }}
                                 transition={{ duration: 0.8, delay: i * 0.05 }}
                                 className="h-full bg-accent rounded-full"
@@ -379,119 +494,135 @@ const Index = () => {
             transition={{ delay: 0.25 }}
             className="glass-card p-5"
           >
-              {/* Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-status-danger" />
-                    <h3 className="font-semibold text-foreground">Risk Overview &amp; Alerts</h3>
-                    <span className="text-[10px] font-medium text-status-danger bg-status-danger/10 border border-status-danger/20 px-2 py-0.5 rounded-full">
-                      {criticalAndHighCount} critical & high
-                    </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                    <Zap className="w-3 h-3 text-accent" />
-                    AI-detected risks from Slack, Jira, meetings &amp; email across all projects.
-                  </p>
+            {/* Collapsible Header */}
+            <button
+              onClick={() => setRiskCollapsed(!riskCollapsed)}
+              className="w-full flex items-start justify-between mb-1 group"
+            >
+              <div className="text-left">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-status-danger" />
+                  <h3 className="font-semibold text-foreground">Risk Overview &amp; Alerts</h3>
+                  <span className="text-[10px] font-medium text-status-danger bg-status-danger/10 border border-status-danger/20 px-2 py-0.5 rounded-full">
+                    {criticalAndHighCount} critical &amp; high
+                  </span>
                 </div>
+                <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1 ml-6">
+                  <Zap className="w-3 h-3 text-accent" />
+                  AI-detected risks from Slack, Jira, meetings &amp; email across all projects.
+                </p>
               </div>
+              <ChevronDown className={`w-5 h-5 text-muted-foreground shrink-0 transition-transform mt-1 ${riskCollapsed ? "-rotate-90" : ""}`} />
+            </button>
 
-              {/* Filters */}
-              <div className="flex items-center gap-2 flex-wrap mb-3">
-                {(["all", "critical", "high", "medium", "low"] as ("all" | RiskSeverity)[]).map((s) => (
-                  <button key={s} onClick={() => setRiskSeverity(s)}
-                    className={`px-2.5 py-1 rounded-full text-[10px] font-medium border transition-colors ${
-                      riskSeverity === s ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-transparent hover:bg-secondary/70"
-                    }`}>
-                    {s === "all" ? "All severity" : severityConfig[s].label}
-                  </button>
-                ))}
-                <select
-                  value={riskProject}
-                  onChange={(e) => setRiskProject(e.target.value)}
-                  className="ml-auto text-[10px] bg-secondary border-0 rounded-lg px-2 py-1 text-muted-foreground outline-none cursor-pointer"
+            <AnimatePresence initial={false}>
+              {!riskCollapsed && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
                 >
-                  <option value="all">All projects</option>
-                  {[...new Set(allRisks.map(r => r.project))].map(p => (
-                    <option key={p} value={p}>{p}</option>
-                  ))}
-                </select>
-              </div>
+                  {/* Filters */}
+                  <div className="flex items-center gap-2 flex-wrap mb-3 mt-3">
+                    {(["all", "critical", "high", "medium", "low"] as ("all" | RiskSeverity)[]).map((s) => (
+                      <button key={s} onClick={() => setRiskSeverity(s)}
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-medium border transition-colors ${
+                          riskSeverity === s ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-transparent hover:bg-secondary/70"
+                        }`}>
+                        {s === "all" ? "All severity" : severityConfig[s].label}
+                      </button>
+                    ))}
+                    <select
+                      value={riskProject}
+                      onChange={(e) => setRiskProject(e.target.value)}
+                      className="ml-auto text-[10px] bg-secondary border-0 rounded-lg px-2 py-1 text-muted-foreground outline-none cursor-pointer"
+                    >
+                      <option value="all">All projects</option>
+                      {[...new Set(allRisks.map(r => r.project))].map(p => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                  </div>
 
-              {/* Risk list */}
-              <div className="space-y-2 max-h-[420px] overflow-y-auto pr-0.5">
-                {filteredRisks.length === 0 && (
-                  <div className="py-6 text-center text-sm text-muted-foreground">No risks match the current filters.</div>
-                )}
-                {filteredRisks.map((risk) => {
-                  const sev = severityConfig[risk.severity];
-                  return (
-                    <div key={risk.id}>
-                      <div
-                        onClick={() => setExpandedRisk(expandedRisk === risk.id ? null : risk.id)}
-                        className="flex items-start gap-3 p-3 rounded-xl bg-secondary/40 border border-border/60 hover:bg-secondary/60 cursor-pointer transition-all group"
-                      >
-                        <div className={`w-1 self-stretch rounded-full shrink-0 ${sev.bar}`} />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${sev.chip}`}>{sev.label}</span>
-                            <span className="text-[10px] text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">{risk.project}</span>
-                            <span className="text-[10px] text-muted-foreground ml-auto hidden sm:inline">{risk.detectedAgo}</span>
-                          </div>
-                          <p className="text-sm font-medium text-foreground mt-1">{risk.title}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{risk.impact}</p>
-                          {/* Source icons */}
-                          <div className="flex items-center gap-1 mt-1.5">
-                            <span className="text-[10px] text-muted-foreground mr-1">From:</span>
-                            {risk.sources.map((s) => {
-                              const Icon = sourceIconMap[s] || Info;
-                              return (
-                                <span key={s} title={s} className="w-5 h-5 rounded bg-background border border-border flex items-center justify-center">
-                                  <Icon className="w-2.5 h-2.5 text-accent" />
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </div>
-                        <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 mt-1 transition-transform ${expandedRisk === risk.id ? "rotate-180" : ""}`} />
-                      </div>
-
-                      <AnimatePresence>
-                        {expandedRisk === risk.id && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.18 }}
-                            className="overflow-hidden"
+                  {/* Risk list */}
+                  <div className="space-y-2 max-h-[420px] overflow-y-auto pr-0.5">
+                    {filteredRisks.length === 0 && (
+                      <div className="py-6 text-center text-sm text-muted-foreground">No risks match the current filters.</div>
+                    )}
+                    {filteredRisks.map((risk) => {
+                      const sev = severityConfig[risk.severity];
+                      return (
+                        <div key={risk.id}>
+                          <div
+                            onClick={() => setExpandedRisk(expandedRisk === risk.id ? null : risk.id)}
+                            className="flex items-start gap-3 p-3 rounded-xl bg-secondary/40 border border-border/60 hover:bg-secondary/60 cursor-pointer transition-all group"
                           >
-                            <div className="mx-1 mb-2 p-3 rounded-xl border border-border bg-card space-y-2">
-                              <div className="flex items-start gap-2 p-2.5 rounded-lg bg-status-warning/5 border border-status-warning/20">
-                                <Lightbulb className="w-3.5 h-3.5 text-status-warning shrink-0 mt-0.5" />
-                                <div>
-                                  <p className="text-[10px] font-semibold text-foreground uppercase tracking-wide mb-0.5">Suggested Next Action</p>
-                                  <p className="text-xs text-muted-foreground">{risk.nextAction}</p>
-                                </div>
+                            <div className={`w-1 self-stretch rounded-full shrink-0 ${sev.bar}`} />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${sev.chip}`}>{sev.label}</span>
+                                <span className="text-[10px] text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">{risk.project}</span>
+                                <span className="text-[10px] text-muted-foreground ml-auto hidden sm:inline">{risk.detectedAgo}</span>
                               </div>
-                              <div className="flex items-center justify-between">
-                                <button
-                                  onClick={() => navigate(`/project/${risk.projectSlug}`)}
-                                  className="text-xs text-accent hover:underline flex items-center gap-1"
-                                >
-                                  View project <ArrowUpRight className="w-3 h-3" />
-                                </button>
-                                <button onClick={() => setExpandedRisk(null)} className="p-1 rounded hover:bg-secondary transition-colors">
-                                  <X className="w-3 h-3 text-muted-foreground" />
-                                </button>
+                              <p className="text-sm font-medium text-foreground mt-1">{risk.title}</p>
+                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{risk.impact}</p>
+                              {/* Source icons */}
+                              <div className="flex items-center gap-1 mt-1.5">
+                                <span className="text-[10px] text-muted-foreground mr-1">From:</span>
+                                {risk.sources.map((s) => {
+                                  const Icon = sourceIconMap[s] || Info;
+                                  return (
+                                    <span key={s} title={s} className="w-5 h-5 rounded bg-background border border-border flex items-center justify-center">
+                                      <Icon className="w-2.5 h-2.5 text-accent" />
+                                    </span>
+                                  );
+                                })}
                               </div>
                             </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  );
-                })}
-              </div>
+                            <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 mt-1 transition-transform ${expandedRisk === risk.id ? "rotate-180" : ""}`} />
+                          </div>
+
+                          <AnimatePresence>
+                            {expandedRisk === risk.id && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.18 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="mx-1 mb-2 p-3 rounded-xl border border-border bg-card space-y-2">
+                                  <div className="flex items-start gap-2 p-2.5 rounded-lg bg-status-warning/5 border border-status-warning/20">
+                                    <Lightbulb className="w-3.5 h-3.5 text-status-warning shrink-0 mt-0.5" />
+                                    <div>
+                                      <p className="text-[10px] font-semibold text-foreground uppercase tracking-wide mb-0.5">Suggested Next Action</p>
+                                      <p className="text-xs text-muted-foreground">{risk.nextAction}</p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <button
+                                      onClick={() => navigate(`/project/${risk.projectSlug}`)}
+                                      className="text-xs text-accent hover:underline flex items-center gap-1"
+                                    >
+                                      View project <ArrowUpRight className="w-3 h-3" />
+                                    </button>
+                                    <button onClick={() => setExpandedRisk(null)} className="p-1 rounded hover:bg-secondary transition-colors">
+                                      <X className="w-3 h-3 text-muted-foreground" />
+                                    </button>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
 
         </main>
