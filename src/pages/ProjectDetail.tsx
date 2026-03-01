@@ -248,6 +248,106 @@ const projectsData: Record<string, {
       { source: "Meetings", items: 2, lastActivity: "Yesterday" },
     ],
   },
+  "mobile-app-v2": {
+    name: "Mobile App v2",
+    status: "on-track",
+    confidence: "high",
+    progress: 61,
+    startDate: "Feb 1, 2026",
+    dueDate: "Apr 5, 2026",
+    stage: "Build",
+    lastActivity: "1 hr ago",
+    risk: "low",
+    team: [
+      { name: "Jade K.", role: "PM", isOwner: true },
+      { name: "Sam T.", role: "iOS Lead" },
+      { name: "Priya N.", role: "Android" },
+      { name: "Lin W.", role: "QA" },
+    ],
+    sources: ["slack", "jira", "meeting"],
+    signals: "28 Slack threads · 16 Jira updates · 1 meeting",
+    snapshot: "Mobile app v2 introduces offline sync, push notifications, and a redesigned onboarding flow. Android offline sync has passed all edge-case tests. iOS testing is underway. Push notifications are 70% complete — FCM done, APNs integration in progress.",
+    remainingSteps: [
+      { label: "Complete APNs push notification integration", est: "3 days" },
+      { label: "iOS offline sync edge-case testing", est: "2 days" },
+      { label: "Redesigned onboarding flow QA", est: "1 day" },
+      { label: "App store submission & review", est: "5 days" },
+    ],
+    estimatedCompletion: "Apr 5, 2026",
+    whyThisProject: "v2 targets a 40% improvement in DAU by enabling offline usage for field teams. Push notifications are a top-requested feature from 73% of beta users. Onboarding redesign reduces drop-off rate by an estimated 25%.",
+    decisions: [
+      { date: "Feb 19", title: "Prioritize push notifications over dark mode", who: "Jade K.", rationale: "73% of beta users requested push notifications vs 28% for dark mode. Sprint 11 unanimous agreement.", flagged: false, sources: ["Meeting transcript", "Sprint 11 notes"], scopeChange: "No scope change", type: "decision" },
+      { date: "Feb 20", title: "Defer accessibility audit to post-launch", who: "Jade K.", rationale: "April 2 deadline insufficient for both audit and push notifications. Risk accepted by product lead.", flagged: true, sources: ["Email", "Jira MOB-290"], scopeChange: "Reduced scope", type: "decision" },
+      { date: "Feb 14", title: "Offline sync milestone reached (Android)", who: "Sam T.", rationale: "All 23 edge-case tests passing on Android. iOS in progress.", flagged: false, sources: ["Slack #mobile-v2-dev", "Jira MOB-265"], scopeChange: "No scope change", type: "milestone" },
+    ],
+    milestones: [
+      { date: "Feb 5", label: "Onboarding Redesign", done: true },
+      { date: "Feb 14", label: "Android Offline Sync", done: true },
+      { date: "Mar 10", label: "iOS Offline Sync", done: false },
+      { date: "Mar 20", label: "Push Notifications", done: false },
+      { date: "Apr 5", label: "App Store Submit", done: false },
+    ],
+    blockers: [],
+    risks: [
+      { description: "Accessibility audit deferred — post-launch remediation costs possible", severity: "low", source: "Email / PM", nextAction: "Budget for post-launch accessibility sprint" },
+    ],
+    dataBreakdown: [
+      { source: "Slack", items: 28, lastActivity: "1 hr ago" },
+      { source: "Jira", items: 16, lastActivity: "3 hrs ago" },
+      { source: "Meetings", items: 1, lastActivity: "2 days ago" },
+    ],
+  },
+  "data-pipeline-refactor": {
+    name: "Data Pipeline Refactor",
+    status: "at-risk",
+    confidence: "medium",
+    progress: 28,
+    startDate: "Feb 3, 2026",
+    dueDate: "Mar 28, 2026",
+    stage: "Design",
+    lastActivity: "3 days ago",
+    risk: "high",
+    team: [
+      { name: "Raj M.", role: "Lead Engineer", isOwner: true },
+      { name: "Chen L.", role: "Data Engineer" },
+      { name: "Fatima O.", role: "DevOps" },
+    ],
+    sources: ["slack", "jira", "email"],
+    signals: "19 Slack threads · 11 Jira updates · 4 emails",
+    snapshot: "Replacing the batch ETL pipeline with a real-time Kafka + Flink streaming architecture. RFC approved but the PoC is blocked by a known memory leak in vendor SDK v4.2. Current batch pipeline misses SLA by 4 minutes on peak days (down from 12 with a temporary fix).",
+    remainingSteps: [
+      { label: "Resolve vendor SDK v4.3 release or evaluate alternative", est: "3 days" },
+      { label: "Complete streaming PoC with Kafka + Flink", est: "5 days" },
+      { label: "Team Flink ramp-up training", est: "10 days" },
+      { label: "Migrate batch pipelines to streaming", est: "8 days" },
+      { label: "Performance validation & SLA compliance test", est: "3 days" },
+    ],
+    estimatedCompletion: "Mar 28, 2026 (at risk)",
+    whyThisProject: "Current batch pipeline misses SLA targets on peak days, directly impacting downstream reporting. Streaming architecture enables sub-second latency and unblocks 2 product teams waiting on real-time data. Projected $60K/year savings in compute once streaming replaces batch.",
+    decisions: [
+      { date: "Feb 18", title: "Adopt Kafka + Flink streaming stack", who: "Raj M.", rationale: "Approved by architecture review board. Sub-second latency and native backpressure handling justify 2-3 week ramp-up.", flagged: false, sources: ["Confluence RFC", "Architecture Review"], scopeChange: "No scope change", type: "decision" },
+      { date: "Feb 25", title: "Evaluate Confluent Cloud as alternative", who: "Chen L.", rationale: "40% less ops overhead vs self-managed Kafka. 2-week trial recommended.", flagged: false, sources: ["Email", "Jira PIPE-160"], scopeChange: "No scope change", type: "decision" },
+    ],
+    milestones: [
+      { date: "Feb 5", label: "RFC Approved", done: true },
+      { date: "Feb 18", label: "Architecture Review", done: true },
+      { date: "Mar 5", label: "Streaming PoC", done: false },
+      { date: "Mar 15", label: "Pipeline Migration", done: false },
+      { date: "Mar 28", label: "SLA Validation", done: false },
+    ],
+    blockers: [
+      { date: "Feb 24", label: "Vendor SDK v4.2 memory leak — PoC blocked", resolved: false },
+    ],
+    risks: [
+      { description: "Vendor SDK v4.2 memory leak blocks streaming PoC", severity: "high", source: "Slack #data-pipeline-eng", nextAction: "Evaluate Confluent Cloud or wait for SDK v4.3" },
+      { description: "Team needs 2 weeks Flink ramp-up before PoC", severity: "medium", source: "Meeting transcript", nextAction: "Evaluate contractor with Flink experience or managed Flink service" },
+    ],
+    dataBreakdown: [
+      { source: "Slack", items: 19, lastActivity: "3 days ago" },
+      { source: "Jira", items: 11, lastActivity: "3 days ago" },
+      { source: "Email", items: 4, lastActivity: "2 days ago" },
+    ],
+  },
 };
 
 const statusConfig = {
@@ -317,7 +417,7 @@ const ProjectDetail = () => {
           {/* Back */}
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-5">
             <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-5">
-              <ArrowLeft className="w-4 h-4" /> Back to Portfolio
+              <ArrowLeft className="w-4 h-4" /> Back to Project Dashboard
             </Link>
 
             {/* Top header card */}
@@ -429,11 +529,11 @@ const ProjectDetail = () => {
                     </div>
                   </div>
 
-                  {/* Why this project */}
+                  {/* Project Objective */}
                   <div className="glass-card p-5">
                     <div className="flex items-center gap-2 mb-2">
                       <Sparkles className="w-4 h-4 text-accent" />
-                      <h3 className="font-semibold text-foreground">Why This Project?</h3>
+                      <h3 className="font-semibold text-foreground">Project Objective</h3>
                     </div>
                     <p className="text-sm text-muted-foreground leading-relaxed">{project.whyThisProject}</p>
                   </div>
@@ -448,8 +548,8 @@ const ProjectDetail = () => {
                       </Tooltip>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      {project.dataBreakdown.map((d) => (
-                        <div key={d.source} onClick={() => navigate(`/sources?source=${d.source.toLowerCase()}&project=${slug}`)}
+                     {project.dataBreakdown.map((d) => (
+                        <div key={d.source} onClick={() => navigate(`/sources?source=${d.source === "Meetings" ? "transcript" : d.source.toLowerCase()}&project=${slug}`)}
                           className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 border border-border/50 cursor-pointer hover:bg-secondary transition-all group">
                           <div className="p-2 rounded-lg bg-background">
                             {d.source === "Slack" && <Hash className="w-4 h-4 text-accent" />}
@@ -470,27 +570,6 @@ const ProjectDetail = () => {
 
                 {/* Right column */}
                 <div className="space-y-4">
-                  {/* Team */}
-                  <div className="glass-card p-5">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Users className="w-4 h-4 text-accent" />
-                      <h3 className="font-semibold text-foreground">Team</h3>
-                    </div>
-                    <div className="space-y-2">
-                      {project.team.map((t, i) => (
-                        <div key={t.name} className="flex items-center gap-2.5 py-1.5">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0 ${avatarColors[i % avatarColors.length]}`}>
-                            {t.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-foreground truncate">{t.name}</p>
-                            <p className="text-[10px] text-muted-foreground">{t.role}{t.isOwner ? " · Owner" : ""}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
                   {/* Top Risks */}
                   {project.risks.length > 0 && (
                     <div className="glass-card p-5">
@@ -523,6 +602,27 @@ const ProjectDetail = () => {
                           </div>
                           <span className={`text-xs flex-1 ${m.done ? "text-foreground" : "text-muted-foreground"}`}>{m.label}</span>
                           <span className="text-[10px] text-muted-foreground">{m.date}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Team */}
+                  <div className="glass-card p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Users className="w-4 h-4 text-accent" />
+                      <h3 className="font-semibold text-foreground">Team</h3>
+                    </div>
+                    <div className="space-y-2">
+                      {project.team.map((t, i) => (
+                        <div key={t.name} className="flex items-center gap-2.5 py-1.5">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0 ${avatarColors[i % avatarColors.length]}`}>
+                            {t.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate">{t.name}</p>
+                            <p className="text-[10px] text-muted-foreground">{t.role}{t.isOwner ? " · Owner" : ""}</p>
+                          </div>
                         </div>
                       ))}
                     </div>

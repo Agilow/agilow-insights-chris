@@ -224,16 +224,19 @@ const Index = () => {
   const [syncSteps, setSyncSteps] = useState<SyncStep[]>([]);
   const [projects, setProjects] = useState(baseProjects);
   const [lastSynced, setLastSynced] = useState<string | null>(null);
+  const [thinkingSeconds, setThinkingSeconds] = useState<number | null>(null);
 
   const handleRefresh = async () => {
     if (isSyncing) return;
     setIsSyncing(true);
     setHealthCollapsed(false);
+    setThinkingSeconds(null);
 
     const steps: Array<{ label: string; icon: React.ElementType }> = [
       { label: "Pulling from Jira…", icon: TicketCheck },
       { label: "Pulling from Slack…", icon: Hash },
       { label: "Scanning emails…", icon: Mail },
+      { label: "Pulling meeting transcripts…", icon: Video },
       { label: "Connecting the dots…", icon: Zap },
     ];
 
@@ -248,12 +251,21 @@ const Index = () => {
       })));
     }
 
-    await new Promise((res) => setTimeout(res, 400));
+    // Simulate "thinking" countdown after connecting the dots
+    const thinkTime = Math.floor(Math.random() * 3) + 4; // 4–6 seconds
+    for (let t = thinkTime; t >= 1; t--) {
+      setThinkingSeconds(t);
+      await new Promise((res) => setTimeout(res, 1000));
+    }
+    setThinkingSeconds(0);
+
+    await new Promise((res) => setTimeout(res, 300));
     setProjects(refreshedProjects);
     setLastSynced("Just now");
 
     await new Promise((res) => setTimeout(res, 1200));
     setSyncSteps([]);
+    setThinkingSeconds(null);
     setIsSyncing(false);
   };
 
@@ -362,6 +374,26 @@ const Index = () => {
                       </div>
                     );
                   })}
+                  {thinkingSeconds !== null && thinkingSeconds > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="flex items-center gap-1.5 text-xs text-accent font-medium ml-2 border border-accent/20 bg-accent/5 px-2.5 py-1 rounded-full"
+                    >
+                      <Zap className="w-3 h-3" />
+                      Thinking… {thinkingSeconds}s
+                    </motion.div>
+                  )}
+                  {thinkingSeconds === 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="flex items-center gap-1.5 text-xs text-status-success font-medium ml-2"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Done · project health updated
+                    </motion.div>
+                  )}
                 </div>
               </motion.div>
             )}
