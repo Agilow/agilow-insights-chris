@@ -23,7 +23,7 @@ import {
   ChevronDown,
   RefreshCw,
 } from "lucide-react";
-import { AppSidebar } from "@/components/AppSidebar";
+import { AppSidebar, MobileMenuButton } from "@/components/AppSidebar";
 import { ChatPanel } from "@/components/ChatPanel";
 import { useNavigate } from "react-router-dom";
 
@@ -318,17 +318,18 @@ const Index = () => {
 
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border h-16 flex items-center justify-between px-6">
-          <div className="flex items-center gap-3">
-            <div className="relative">
+        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border h-16 flex items-center justify-between px-3 sm:px-6 gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <MobileMenuButton />
+            <div className="relative hidden sm:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 placeholder="Search projects, decisions, people..."
-                className="h-9 w-72 rounded-lg bg-secondary pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-accent/30 transition"
+                className="h-9 w-48 lg:w-72 rounded-lg bg-secondary pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-accent/30 transition"
               />
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             {/* Refresh button */}
             <div className="flex items-center gap-2">
               {lastSynced && !isSyncing && (
@@ -359,16 +360,16 @@ const Index = () => {
             </button>
             <button
               onClick={() => setChatOpen(true)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
             >
               <MessageSquare className="w-4 h-4" />
-              Ask Agilow
+              <span className="hidden sm:inline">Ask Agilow</span>
             </button>
           </div>
         </header>
 
         {/* Main content */}
-        <main className="flex-1 p-6 space-y-6 max-w-[1400px]">
+        <main className="flex-1 p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-[1400px]">
           {/* Welcome */}
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-foreground">Good morning, Elena</h1>

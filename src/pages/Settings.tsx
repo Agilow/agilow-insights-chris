@@ -11,7 +11,7 @@ import {
   Users,
   Palette,
 } from "lucide-react";
-import { AppSidebar } from "@/components/AppSidebar";
+import { AppSidebar, MobileMenuButton } from "@/components/AppSidebar";
 import { ChatPanel } from "@/components/ChatPanel";
 
 const integrations = [
@@ -39,37 +39,40 @@ const Settings = () => {
       <AppSidebar />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border h-16 flex items-center justify-between px-6">
-          <h2 className="text-sm font-bold text-foreground">Settings</h2>
+        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border h-16 flex items-center justify-between px-3 sm:px-6 gap-2">
           <div className="flex items-center gap-2">
+            <MobileMenuButton />
+            <h2 className="text-sm font-bold text-foreground">Settings</h2>
+          </div>
+          <div className="flex items-center gap-1 sm:gap-2">
             <button className="p-2 rounded-lg hover:bg-secondary transition-colors relative">
               <Bell className="w-5 h-5 text-muted-foreground" />
             </button>
             <button
               onClick={() => setChatOpen(true)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
             >
               <MessageSquare className="w-4 h-4" />
-              Ask Agilow
+              <span className="hidden sm:inline">Ask Agilow</span>
             </button>
           </div>
         </header>
 
-        <main className="flex-1 p-6 max-w-[900px]">
+        <main className="flex-1 p-3 sm:p-6 max-w-[900px]">
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Settings</h1>
             <p className="text-sm text-muted-foreground mt-1">
               Manage integrations, team access, and preferences
             </p>
           </motion.div>
 
-          {/* Tabs */}
-          <div className="flex gap-1 mt-6 mb-6 bg-secondary rounded-lg p-1 w-fit">
+          {/* Tabs — scroll on mobile */}
+          <div className="flex gap-1 mt-6 mb-6 bg-secondary rounded-lg p-1 overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   activeTab === tab.id
                     ? "bg-card text-foreground shadow-soft"
                     : "text-muted-foreground hover:text-foreground"
