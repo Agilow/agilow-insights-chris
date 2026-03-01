@@ -397,32 +397,26 @@ const Index = () => {
             </div>
           </div>
 
-          {/* ── Two column: Effort chart + Risk panel ──────────────────────── */}
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-            <div className="lg:col-span-2">
-              <EffortChart />
-            </div>
-
-            {/* ── AI Risk Early Warning System ──────────────────────────────── */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              className="lg:col-span-3 glass-card p-5"
-            >
+          {/* ── Risk Overview & Alerts ────────────────────────────────────── */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="glass-card p-5"
+          >
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <div className="flex items-center gap-2">
                     <Shield className="w-4 h-4 text-status-danger" />
-                    <h3 className="font-semibold text-foreground">Early Warning System</h3>
+                    <h3 className="font-semibold text-foreground">Risk Overview &amp; Alerts</h3>
                     <span className="text-[10px] font-medium text-status-danger bg-status-danger/10 border border-status-danger/20 px-2 py-0.5 rounded-full">
                       {criticalCount} urgent
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
                     <Zap className="w-3 h-3 text-accent" />
-                    AI-detected from Slack, Jira, meetings & email
+                    AI-detected risks from Slack, Jira, meetings &amp; email across all projects.
                   </p>
                 </div>
               </div>
@@ -523,7 +517,12 @@ const Index = () => {
                   );
                 })}
               </div>
-            </motion.div>
+          </motion.div>
+
+          {/* ── Additional Insights ───────────────────────────────────────── */}
+          <div>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-3">Additional Insights</h2>
+            <EffortChart />
           </div>
         </main>
       </div>
