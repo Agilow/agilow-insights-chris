@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import { AppSidebar, MobileMenuButton } from "@/components/AppSidebar";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { RiskDetailDrawer, type EnhancedRisk } from "@/components/RiskDetailDrawer";
+import { RiskFeedback } from "@/components/RiskFeedback";
 
 const sourceIcons = {
   slack: { icon: Hash, label: "Slack" },
