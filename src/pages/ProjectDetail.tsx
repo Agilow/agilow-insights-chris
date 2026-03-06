@@ -6,6 +6,7 @@ import {
   Video, Users, Calendar, GitBranch, Flag, AlertCircle, Info, ExternalLink,
   Sparkles, Filter, ChevronDown, TrendingUp, TrendingDown, Minus,
   ThumbsUp, ThumbsDown, Pencil, X, ChevronUp, Save, ShieldAlert, ShieldCheck,
+  CalendarClock, Milestone, Gavel, History,
 } from "lucide-react";
 import { AppSidebar, MobileMenuButton } from "@/components/AppSidebar";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -743,6 +744,8 @@ const ProjectDetail = () => {
   const project = projectsData[slug || ""];
   const [activeTab, setActiveTab] = useState<"overview" | "timeline" | "risks">("overview");
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
+  const [timelineMode, setTimelineMode] = useState<"upcoming" | "history">("upcoming");
+  const [upcomingWindow, setUpcomingWindow] = useState<"7" | "30" | "all">("all");
   const [editingTimelineIdx, setEditingTimelineIdx] = useState<number | null>(null);
   const [timelineEdits, setTimelineEdits] = useState<Record<number, Partial<TimelineEntry>>>({});
   const [showSnapshotEdit, setShowSnapshotEdit] = useState(false);
@@ -1103,108 +1106,238 @@ const ProjectDetail = () => {
               </motion.div>
             )}
 
-            {/* ── TIMELINE & DECISIONS TAB ────────────────────────────────── */}
+            {/* ── TIMELINE TAB — History / Upcoming ────────────────────── */}
             {activeTab === "timeline" && (
               <motion.div key="timeline" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                <div className="glass-card p-5">
-                  <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-                    <div>
-                      <h3 className="font-semibold text-foreground">Project Timeline</h3>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                        <Sparkles className="w-3 h-3 text-accent" />
-                        Generated from connected sources — meeting notes, Slack, Jira tickets, email threads.
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-                      {(["all", "decision", "milestone", "blocker", "other"] as TimelineFilter[]).map((f) => (
-                        <button key={f} onClick={() => setTimelineFilter(f)}
-                          className={`px-2.5 py-1 rounded-full text-[10px] font-medium border transition-colors capitalize ${
-                            timelineFilter === f ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-transparent hover:bg-secondary/70"
-                          }`}>
-                          {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1) + "s"}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="relative">
-                    <div className="absolute left-[11px] top-2 bottom-2 w-px bg-border" />
-                    <div className="space-y-4">
-                      {filteredTimeline.length === 0 && (
-                        <p className="text-sm text-muted-foreground py-4 text-center">No entries for this filter.</p>
-                      )}
-                      {filteredTimeline.map((entry, i) => {
-                        const isMilestone = entry.entryType === "milestone";
-                        const isBlocker = entry.entryType === "blocker";
-                        return (
-                          <div key={i} className="flex gap-3 relative">
-                            <div className="shrink-0 mt-1 z-10">
-                              {entry.flagged ? (
-                                <div className="w-6 h-6 rounded-full bg-destructive/10 flex items-center justify-center">
-                                  <AlertCircle className="w-3.5 h-3.5 text-destructive" />
-                                </div>
-                              ) : isMilestone ? (
-                                <div className="w-6 h-6 rounded-full bg-status-success/10 flex items-center justify-center">
-                                  <CheckCircle2 className="w-3.5 h-3.5 text-status-success" />
-                                </div>
-                              ) : isBlocker ? (
-                                <div className="w-6 h-6 rounded-full bg-status-warning/10 flex items-center justify-center">
-                                  <Clock className="w-3.5 h-3.5 text-status-warning" />
-                                </div>
-                              ) : (
-                                <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center">
-                                  <GitBranch className="w-3.5 h-3.5 text-accent" />
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex-1 pb-1">
-                              <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                                <span className="text-xs text-muted-foreground">{entry.date}</span>
-                                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
-                                  entry.entryType === "milestone" ? "bg-status-success/10 text-status-success" :
-                                  entry.entryType === "blocker" ? "bg-status-warning/10 text-status-warning" :
-                                  entry.entryType === "decision" ? "bg-accent/10 text-accent" :
-                                  "bg-secondary text-muted-foreground"
-                                }`}>
-                                  {entry.entryType}
-                                </span>
-                                {entry.flagged && (
-                                  <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-destructive bg-destructive/10 px-1.5 py-0.5 rounded-full">
-                                    <Flag className="w-2.5 h-2.5" /> Lesson Learned
-                                  </span>
-                                )}
-                                <button
-                                  onClick={() => setEditingTimelineIdx(i)}
-                                  className="ml-auto text-[10px] text-muted-foreground/50 hover:text-muted-foreground flex items-center gap-0.5 transition-colors"
-                                >
-                                  <Pencil className="w-2.5 h-2.5" /> Edit
-                                </button>
-                              </div>
-                              <h4 className="text-sm font-medium text-foreground">{entry.title}</h4>
-                              {entry.who && entry.who !== "System" && (
-                                <p className="text-[11px] text-muted-foreground mt-0.5">Decided by {entry.who}</p>
-                              )}
-                              <p className="text-xs text-muted-foreground mt-0.5">{entry.rationale}</p>
-                              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                {entry.scopeChange !== "No scope change" && (
-                                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${
-                                    entry.scopeChange === "Increased scope" ? "text-status-danger bg-status-danger/10 border-status-danger/20" : "text-status-success bg-status-success/10 border-status-success/20"
-                                  }`}>{entry.scopeChange}</span>
-                                )}
-                                {entry.sources.map((s, j) => (
-                                  <span key={j} className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                                    <GitBranch className="w-2.5 h-2.5" />{s}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                {/* Sub-tabs: Upcoming / History */}
+                <div className="flex items-center gap-1 mb-4 bg-secondary rounded-lg p-0.5 w-fit">
+                  <button
+                    onClick={() => setTimelineMode("upcoming")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                      timelineMode === "upcoming" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <CalendarClock className="w-3.5 h-3.5" /> Upcoming
+                  </button>
+                  <button
+                    onClick={() => setTimelineMode("history")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                      timelineMode === "history" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <History className="w-3.5 h-3.5" /> History
+                  </button>
                 </div>
+
+                {timelineMode === "upcoming" ? (
+                  /* ── UPCOMING ──────────────────────────────────────────── */
+                  <div className="glass-card p-5">
+                    <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+                      <div>
+                        <h3 className="font-semibold text-foreground">Upcoming</h3>
+                        <p className="text-xs text-muted-foreground mt-0.5">Future tasks, milestones, and decisions</p>
+                      </div>
+                      <div className="flex items-center gap-1 bg-secondary rounded-lg p-0.5">
+                        {([["7", "Next 7 days"], ["30", "Next 30 days"], ["all", "All"]] as const).map(([val, label]) => (
+                          <button
+                            key={val}
+                            onClick={() => setUpcomingWindow(val)}
+                            className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-colors ${
+                              upcomingWindow === val ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {(() => {
+                      const now = new Date("2026-03-06");
+                      let items = project.upcoming.map(u => ({
+                        ...u,
+                        dateObj: new Date(u.date + ", 2026"),
+                      })).sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
+
+                      if (upcomingWindow === "7") {
+                        const cutoff = new Date(now.getTime() + 7 * 86400000);
+                        items = items.filter(i => i.dateObj <= cutoff);
+                      } else if (upcomingWindow === "30") {
+                        const cutoff = new Date(now.getTime() + 30 * 86400000);
+                        items = items.filter(i => i.dateObj <= cutoff);
+                      }
+
+                      if (items.length === 0) {
+                        return <p className="text-sm text-muted-foreground py-4 text-center">No upcoming items in this window.</p>;
+                      }
+
+                      const typeIcons: Record<string, { icon: React.ElementType; color: string; bg: string }> = {
+                        task: { icon: CheckCircle2, color: "text-accent", bg: "bg-accent/10" },
+                        milestone: { icon: Flag, color: "text-status-success", bg: "bg-status-success/10" },
+                        "gate-decision": { icon: Gavel, color: "text-status-warning", bg: "bg-status-warning/10" },
+                        review: { icon: Users, color: "text-accent", bg: "bg-accent/10" },
+                        meeting: { icon: Video, color: "text-muted-foreground", bg: "bg-secondary" },
+                      };
+
+                      return (
+                        <div className="relative">
+                          <div className="absolute left-[11px] top-2 bottom-2 w-px bg-border" />
+                          <div className="space-y-3">
+                            {items.map((item, i) => {
+                              const ti = typeIcons[item.type] || typeIcons.task;
+                              const TIcon = ti.icon;
+                              const isPast = item.dateObj < now;
+                              const isThisWeek = item.dateObj >= now && item.dateObj <= new Date(now.getTime() + 7 * 86400000);
+                              return (
+                                <div key={i} className={`flex gap-3 relative ${item.overdue ? "opacity-100" : ""}`}>
+                                  <div className="shrink-0 mt-1 z-10">
+                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center ${item.overdue ? "bg-status-danger/10" : item.atRisk ? "bg-status-warning/10" : ti.bg}`}>
+                                      {item.overdue ? <AlertTriangle className="w-3.5 h-3.5 text-status-danger" /> :
+                                       item.atRisk ? <AlertTriangle className="w-3.5 h-3.5 text-status-warning" /> :
+                                       <TIcon className={`w-3.5 h-3.5 ${ti.color}`} />}
+                                    </div>
+                                  </div>
+                                  <div className="flex-1 pb-1">
+                                    <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                                      <span className="text-xs text-muted-foreground">{item.date}</span>
+                                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
+                                        item.type === "gate-decision" ? "bg-status-warning/10 text-status-warning" :
+                                        item.type === "milestone" ? "bg-status-success/10 text-status-success" :
+                                        item.type === "review" ? "bg-accent/10 text-accent" :
+                                        item.type === "meeting" ? "bg-secondary text-muted-foreground" :
+                                        "bg-accent/10 text-accent"
+                                      }`}>
+                                        {item.type === "gate-decision" ? "Gate Decision" : item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+                                      </span>
+                                      {item.overdue && (
+                                        <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-status-danger bg-status-danger/10 px-1.5 py-0.5 rounded-full">
+                                          Overdue
+                                        </span>
+                                      )}
+                                      {item.atRisk && !item.overdue && (
+                                        <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-status-warning bg-status-warning/10 px-1.5 py-0.5 rounded-full">
+                                          At Risk
+                                        </span>
+                                      )}
+                                      {isThisWeek && !item.overdue && !item.atRisk && (
+                                        <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-accent bg-accent/10 px-1.5 py-0.5 rounded-full">
+                                          This Week
+                                        </span>
+                                      )}
+                                    </div>
+                                    <h4 className={`text-sm font-medium ${item.type === "gate-decision" ? "text-foreground" : "text-foreground"}`}>{item.label}</h4>
+                                    <p className="text-[11px] text-muted-foreground mt-0.5">Owner: {item.owner}</p>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                ) : (
+                  /* ── HISTORY ───────────────────────────────────────────── */
+                  <div className="glass-card p-5">
+                    <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+                      <div>
+                        <h3 className="font-semibold text-foreground">History</h3>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                          <Sparkles className="w-3 h-3 text-accent" />
+                          Completed work and past decisions from connected sources.
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Filter className="w-3.5 h-3.5 text-muted-foreground" />
+                        {(["all", "decision", "milestone", "blocker", "other"] as TimelineFilter[]).map((f) => (
+                          <button key={f} onClick={() => setTimelineFilter(f)}
+                            className={`px-2.5 py-1 rounded-full text-[10px] font-medium border transition-colors capitalize ${
+                              timelineFilter === f ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-transparent hover:bg-secondary/70"
+                            }`}>
+                            {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1) + "s"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="relative">
+                      <div className="absolute left-[11px] top-2 bottom-2 w-px bg-border" />
+                      <div className="space-y-4">
+                        {filteredTimeline.length === 0 && (
+                          <p className="text-sm text-muted-foreground py-4 text-center">No entries for this filter.</p>
+                        )}
+                        {filteredTimeline.map((entry, i) => {
+                          const isMilestone = entry.entryType === "milestone";
+                          const isBlocker = entry.entryType === "blocker";
+                          return (
+                            <div key={i} className="flex gap-3 relative">
+                              <div className="shrink-0 mt-1 z-10">
+                                {entry.flagged ? (
+                                  <div className="w-6 h-6 rounded-full bg-destructive/10 flex items-center justify-center">
+                                    <AlertCircle className="w-3.5 h-3.5 text-destructive" />
+                                  </div>
+                                ) : isMilestone ? (
+                                  <div className="w-6 h-6 rounded-full bg-status-success/10 flex items-center justify-center">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-status-success" />
+                                  </div>
+                                ) : isBlocker ? (
+                                  <div className="w-6 h-6 rounded-full bg-status-warning/10 flex items-center justify-center">
+                                    <Clock className="w-3.5 h-3.5 text-status-warning" />
+                                  </div>
+                                ) : (
+                                  <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center">
+                                    <GitBranch className="w-3.5 h-3.5 text-accent" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-1 pb-1">
+                                <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                                  <span className="text-xs text-muted-foreground">{entry.date}</span>
+                                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
+                                    entry.entryType === "milestone" ? "bg-status-success/10 text-status-success" :
+                                    entry.entryType === "blocker" ? "bg-status-warning/10 text-status-warning" :
+                                    entry.entryType === "decision" ? "bg-accent/10 text-accent" :
+                                    "bg-secondary text-muted-foreground"
+                                  }`}>
+                                    {entry.entryType}
+                                  </span>
+                                  {entry.flagged && (
+                                    <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-destructive bg-destructive/10 px-1.5 py-0.5 rounded-full">
+                                      <Flag className="w-2.5 h-2.5" /> Lesson Learned
+                                    </span>
+                                  )}
+                                  <button
+                                    onClick={() => setEditingTimelineIdx(i)}
+                                    className="ml-auto text-[10px] text-muted-foreground/50 hover:text-muted-foreground flex items-center gap-0.5 transition-colors"
+                                  >
+                                    <Pencil className="w-2.5 h-2.5" /> Edit
+                                  </button>
+                                </div>
+                                <h4 className="text-sm font-medium text-foreground">{entry.title}</h4>
+                                {entry.who && entry.who !== "System" && (
+                                  <p className="text-[11px] text-muted-foreground mt-0.5">Decided by {entry.who}</p>
+                                )}
+                                <p className="text-xs text-muted-foreground mt-0.5">{entry.rationale}</p>
+                                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                                  {entry.scopeChange !== "No scope change" && (
+                                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${
+                                      entry.scopeChange === "Increased scope" ? "text-status-danger bg-status-danger/10 border-status-danger/20" : "text-status-success bg-status-success/10 border-status-success/20"
+                                    }`}>{entry.scopeChange}</span>
+                                  )}
+                                  {entry.sources.map((s, j) => (
+                                    <span key={j} className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+                                      <GitBranch className="w-2.5 h-2.5" />{s}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
 
