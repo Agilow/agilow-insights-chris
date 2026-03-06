@@ -24,26 +24,6 @@ import {
   RefreshCw,
   ShieldAlert,
 } from "lucide-react";
-  MessageSquare,
-  AlertTriangle,
-  CheckCircle2,
-  Clock,
-  Users,
-  Calendar,
-  Hash,
-  TicketCheck,
-  Mail,
-  Video,
-  Shield,
-  Zap,
-  Lightbulb,
-  Info,
-  X,
-  ArrowUpRight,
-  Filter,
-  ChevronDown,
-  RefreshCw,
-} from "lucide-react";
 import { AppSidebar, MobileMenuButton } from "@/components/AppSidebar";
 import { ChatPanel } from "@/components/ChatPanel";
 import { RiskResourcesPanel } from "@/components/dashboard/RiskResourcesPanel";
