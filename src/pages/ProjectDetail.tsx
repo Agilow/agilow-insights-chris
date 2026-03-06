@@ -511,27 +511,7 @@ const riskSeverity = {
 
 type TimelineFilter = "all" | "decision" | "milestone" | "blocker" | "other";
 
-// ─── Risk inline feedback ──────────────────────────────────────────────────
-type FbState = "idle" | "up" | "down" | "submitted";
-function InlineRiskFeedback() {
-  const [state, setState] = useState<FbState>("idle");
-  const [text, setText] = useState("");
-  if (state === "submitted") return <span className="text-[10px] text-muted-foreground">Feedback saved.</span>;
-  if (state === "up") return <span className="text-[10px] text-muted-foreground">Thanks — noted.</span>;
-  return (
-    <div className="flex items-center gap-1">
-      {state === "idle" && (
-        <>
-          <button onClick={(e) => { e.stopPropagation(); setState("up"); }} className="p-0.5 rounded hover:bg-secondary transition-colors text-muted-foreground/40 hover:text-muted-foreground"><ThumbsUp className="w-3 h-3" /></button>
-          <button onClick={(e) => { e.stopPropagation(); setState("down"); }} className="p-0.5 rounded hover:bg-secondary transition-colors text-muted-foreground/40 hover:text-muted-foreground"><ThumbsDown className="w-3 h-3" /></button>
-        </>
-      )}
-      {state === "down" && (
-        <span className="text-[10px] text-muted-foreground italic">We'll review this risk.</span>
-      )}
-    </div>
-  );
-}
+// InlineRiskFeedback removed — now using RiskFeedback component
 
 // ─── Timeline edit modal ───────────────────────────────────────────────────
 type TimelineEntry = {
@@ -718,6 +698,7 @@ const ProjectDetail = () => {
   const [showSnapshotEdit, setShowSnapshotEdit] = useState(false);
   const [snapshotText, setSnapshotText] = useState(project?.snapshot || "");
   const [snapshotSteps, setSnapshotSteps] = useState(project?.remainingSteps || []);
+  const [selectedRisk, setSelectedRisk] = useState<EnhancedRisk | null>(null);
   const [snapshotLastEdited] = useState("Elena R. · 2 min ago");
 
   if (!project) {
@@ -971,6 +952,22 @@ const ProjectDetail = () => {
                         {project.risks.length} risk{project.risks.length !== 1 ? "s" : ""}
                       </span>
                     </div>
+                    {project.risks.length > 0 && (
+                      <p className="text-[10px] text-muted-foreground mb-2">
+                        {project.risks.filter(r => r.type === "ai-detected").length > 0 && (
+                          <span className="inline-flex items-center gap-0.5 mr-2">
+                            <Sparkles className="w-3 h-3 text-accent" />
+                            {project.risks.filter(r => r.type === "ai-detected").length} AI-detected
+                          </span>
+                        )}
+                        {project.risks.filter(r => r.type === "manual").length > 0 && (
+                          <span className="inline-flex items-center gap-0.5">
+                            <Users className="w-3 h-3 text-muted-foreground" />
+                            {project.risks.filter(r => r.type === "manual").length} team-entered
+                          </span>
+                        )}
+                      </p>
+                    )}
                     {project.status === "on-track" && project.risks.length > 0 && (
                       <p className="text-[10px] text-muted-foreground mb-3 flex items-center gap-1">
                         <ShieldCheck className="w-3 h-3 text-status-success" />
@@ -984,16 +981,29 @@ const ProjectDetail = () => {
                       </p>
                     ) : (
                       <div className="space-y-3 mt-2">
-                        {project.risks.map((r, i) => (
-                          <div key={i} className="flex items-start gap-2">
+                        {project.risks.map((r) => (
+                          <div
+                            key={r.id}
+                            onClick={() => setSelectedRisk(r)}
+                            className="flex items-start gap-2 cursor-pointer rounded-lg p-2 -mx-2 hover:bg-secondary/50 transition-colors"
+                          >
                             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 mt-0.5 ${riskSeverity[r.severity]}`}>
                               {r.severity.charAt(0).toUpperCase() + r.severity.slice(1)}
                             </span>
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs text-foreground">{r.description}</p>
-                              <p className="text-[10px] text-muted-foreground mt-0.5">{r.nextAction}</p>
+                              <div className="flex items-center gap-1.5 mb-0.5">
+                                <p className="text-xs text-foreground">{r.description}</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {r.type === "ai-detected" && (
+                                  <span className="inline-flex items-center gap-0.5 text-[9px] text-accent">
+                                    <Sparkles className="w-2.5 h-2.5" /> AI
+                                  </span>
+                                )}
+                                <p className="text-[10px] text-muted-foreground">{r.owner} · {r.status}</p>
+                              </div>
                             </div>
-                            <InlineRiskFeedback />
+                            <RiskFeedback riskId={r.id} variant="inline" />
                           </div>
                         ))}
                       </div>
@@ -1158,27 +1168,60 @@ const ProjectDetail = () => {
                     <p className="text-sm text-muted-foreground mt-1">Agilow hasn't detected any risks for this project yet.</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {project.risks.map((r, i) => (
-                      <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
-                        className="glass-card p-5">
-                        <div className="flex items-start gap-3">
-                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border shrink-0 mt-0.5 ${riskSeverity[r.severity]}`}>
-                            {r.severity.charAt(0).toUpperCase() + r.severity.slice(1)}
-                          </span>
-                          <div className="flex-1">
-                            <p className="text-sm font-semibold text-foreground">{r.description}</p>
-                            <p className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1">
-                              <GitBranch className="w-3 h-3" />{r.source}
-                            </p>
-                            <div className="mt-2 p-2.5 rounded-lg bg-secondary/50 border border-border text-xs text-muted-foreground">
-                              <span className="font-medium text-foreground">Next action: </span>{r.nextAction}
+                  <>
+                    {/* AI vs Manual legend */}
+                    <div className="flex items-center gap-4 mb-4">
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <Sparkles className="w-3.5 h-3.5 text-accent" /> AI-detected risks
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <Users className="w-3.5 h-3.5 text-muted-foreground" /> Team-entered risks
+                      </span>
+                    </div>
+                    <div className="space-y-3">
+                      {project.risks.map((r, i) => (
+                        <motion.div
+                          key={r.id}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.06 }}
+                          onClick={() => setSelectedRisk(r)}
+                          className="glass-card p-5 cursor-pointer hover:ring-1 hover:ring-accent/30 transition-all"
+                        >
+                          <div className="flex items-start gap-3">
+                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border shrink-0 mt-0.5 ${riskSeverity[r.severity]}`}>
+                              {r.severity.charAt(0).toUpperCase() + r.severity.slice(1)}
+                            </span>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 flex-wrap mb-1">
+                                <p className="text-sm font-semibold text-foreground">{r.description}</p>
+                                {r.type === "ai-detected" ? (
+                                  <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-accent bg-accent/10 border border-accent/20 px-1.5 py-0.5 rounded-full">
+                                    <Sparkles className="w-2.5 h-2.5" /> AI
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-muted-foreground bg-secondary border border-border px-1.5 py-0.5 rounded-full">
+                                    <Users className="w-2.5 h-2.5" /> Manual
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3 text-[11px] text-muted-foreground mb-2">
+                                <span className="flex items-center gap-1"><GitBranch className="w-3 h-3" />{r.source}</span>
+                                <span>Owner: {r.owner}</span>
+                                <span className="capitalize">{r.status}</span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <div className="p-2.5 rounded-lg bg-secondary/50 border border-border text-xs text-muted-foreground flex-1 mr-3">
+                                  <span className="font-medium text-foreground">Next action: </span>{r.nextAction}
+                                </div>
+                                <RiskFeedback riskId={r.id} variant="inline" />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </>
                 )}
               </motion.div>
             )}
@@ -1212,8 +1255,14 @@ const ProjectDetail = () => {
           />
         )}
       </AnimatePresence>
+
+      {/* Risk detail drawer */}
+      <AnimatePresence>
+        {selectedRisk && (
+          <RiskDetailDrawer risk={selectedRisk} onClose={() => setSelectedRisk(null)} />
+        )}
+      </AnimatePresence>
     </div>
-  );
 };
 
 export default ProjectDetail;
