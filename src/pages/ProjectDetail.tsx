@@ -716,6 +716,35 @@ const ProjectDetail = () => {
                 </div>
               </div>
             </div>
+
+            {/* ── STATUS EXPLANATION (at-risk / blocked only) ─────────── */}
+            {project.statusExplanation && (project.status === "at-risk" || project.status === "blocked") && (
+              <div id="status-explanation" className="glass-card p-4 sm:p-5 border-l-4 border-l-status-danger mt-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle className="w-4 h-4 text-status-danger" />
+                  <h3 className="font-semibold text-foreground">
+                    Why this project is {st.label}
+                  </h3>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                  {project.statusExplanation.summary}
+                </p>
+                <div className="space-y-1.5">
+                  {project.statusExplanation.causes.map((cause, ci) => (
+                    <div key={ci} className="flex items-center gap-2 text-xs">
+                      <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+                        cause.type === "milestone" ? "bg-status-warning/10" : cause.type === "blocker" ? "bg-status-danger/10" : "bg-status-warning/10"
+                      }`}>
+                        {cause.type === "milestone" ? <Flag className="w-3 h-3 text-status-warning" /> :
+                         cause.type === "blocker" ? <Clock className="w-3 h-3 text-status-danger" /> :
+                         <AlertTriangle className="w-3 h-3 text-status-warning" />}
+                      </span>
+                      <span className="text-foreground">{cause.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
 
           {/* Tabs */}
