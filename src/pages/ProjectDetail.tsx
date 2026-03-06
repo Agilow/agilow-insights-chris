@@ -50,7 +50,7 @@ const projectsData: Record<string, {
   }[];
   milestones: { date: string; label: string; done: boolean }[];
   blockers: { date: string; label: string; resolved: boolean }[];
-  risks: { description: string; severity: "high" | "medium" | "low"; source: string; nextAction: string }[];
+  risks: EnhancedRisk[];
   dataBreakdown: { source: string; items: number; lastActivity: string }[];
 }> = {
   "project-phoenix": {
@@ -99,8 +99,34 @@ const projectsData: Record<string, {
     ],
     blockers: [],
     risks: [
-      { description: "Load testing environment not yet provisioned", severity: "medium", source: "JIRA PHX-201", nextAction: "DevOps to provision staging cluster this sprint" },
-      { description: "Third-party payment SDK update may break integration", severity: "low", source: "Slack #phoenix-eng", nextAction: "Pin SDK version and monitor release notes" },
+      {
+        id: "phx-r1", description: "Load testing environment not yet provisioned", severity: "medium", source: "JIRA PHX-201",
+        nextAction: "DevOps to provision staging cluster this sprint", type: "ai-detected", owner: "Lisa N.", status: "open",
+        impact: "Delays production deploy by 3–5 days if not resolved this sprint", likelihood: "medium",
+        affectedMilestones: ["Load Testing", "Production Deploy"],
+        flaggedReason: "Repeated mentions in 3 Slack threads over 5 days with no Jira status update. DevOps capacity appears stretched across 2 other projects.",
+        signals: [
+          { source: "Slack", summary: "Elena asked about load test env status 3 times in #phoenix-eng with no resolution", date: "Feb 28" },
+          { source: "Jira", summary: "PHX-201 'Provision load test env' has been in 'To Do' for 8 days", date: "Mar 1" },
+        ],
+        sourceLinks: [
+          { label: "JIRA PHX-201 — Provision load test env", type: "jira", url: "#" },
+          { label: "Slack #phoenix-eng — env discussion", type: "slack", url: "#" },
+        ],
+        notes: [{ author: "Elena R.", date: "Mar 1", text: "Lisa confirmed she can start provisioning Monday. Blocked by infra team capacity." }],
+      },
+      {
+        id: "phx-r2", description: "Third-party payment SDK update may break integration", severity: "low", source: "Slack #phoenix-eng",
+        nextAction: "Pin SDK version and monitor release notes", type: "ai-detected", owner: "James K.", status: "in-progress",
+        impact: "Could require 1–2 days of rework if SDK breaks during deploy window", likelihood: "low",
+        flaggedReason: "SDK vendor announced breaking changes in v5.0 release notes. Current integration uses deprecated endpoints.",
+        signals: [
+          { source: "Slack", summary: "James flagged SDK deprecation notice in #phoenix-eng", date: "Feb 26" },
+        ],
+        sourceLinks: [
+          { label: "Slack thread — SDK deprecation", type: "slack", url: "#" },
+        ],
+      },
     ],
     dataBreakdown: [
       { source: "Slack", items: 3, lastActivity: "2 min ago" },
@@ -158,8 +184,33 @@ const projectsData: Record<string, {
       { date: "Feb 18", label: "Vendor auth docs outdated — 3 teams blocked", resolved: false },
     ],
     risks: [
-      { description: "3 teams blocked on auth endpoint — vendor docs outdated", severity: "high", source: "Slack #api-team", nextAction: "Emergency sync with vendor support" },
-      { description: "Client SDK deadline conflicts with testing window", severity: "medium", source: "Email / PM sync", nextAction: "Negotiate SDK deadline with client team" },
+      {
+        id: "api-r1", description: "3 teams blocked on auth endpoint — vendor docs outdated", severity: "high", source: "Slack #api-team",
+        nextAction: "Emergency sync with vendor support", type: "ai-detected", owner: "Sarah W.", status: "open",
+        impact: "Blocks 3 downstream teams and delays client SDK milestone by 2+ weeks", likelihood: "high",
+        affectedMilestones: ["Endpoint Migration", "Client SDK Update"],
+        flaggedReason: "Negative sentiment detected across 5 Slack messages over 3 days. Three separate teams have reported being blocked. Jira blocker ticket remains unresolved for 10 days.",
+        signals: [
+          { source: "Slack", summary: "Team Alpha, Team Beta, and Team Gamma all reported auth endpoint failures in #api-team", date: "Feb 22–25" },
+          { source: "Jira", summary: "API-410 'Auth endpoint migration' blocked — vendor docs reference deprecated API", date: "Feb 20" },
+          { source: "Email", summary: "David escalated to vendor support with no response after 5 business days", date: "Feb 23" },
+        ],
+        sourceLinks: [
+          { label: "JIRA API-410 — Auth endpoint blocked", type: "jira", url: "#" },
+          { label: "Slack #api-team — blocker thread", type: "slack", url: "#" },
+          { label: "Vendor support escalation email", type: "email", url: "#" },
+        ],
+        notes: [{ author: "David P.", date: "Feb 26", text: "Vendor acknowledged issue, ETA for updated docs is March 3." }],
+      },
+      {
+        id: "api-r2", description: "Client SDK deadline conflicts with testing window", severity: "medium", source: "Email / PM sync",
+        nextAction: "Negotiate SDK deadline with client team", type: "manual", owner: "David P.", status: "open",
+        impact: "May force skipping integration tests, increasing production risk", likelihood: "medium",
+        affectedMilestones: ["Client SDK Update"],
+        sourceLinks: [
+          { label: "PM sync meeting notes — deadline discussion", type: "meeting", url: "#" },
+        ],
+      },
     ],
     dataBreakdown: [
       { source: "Slack", items: 3, lastActivity: "5 min ago" },
@@ -258,8 +309,37 @@ const projectsData: Record<string, {
       { date: "Feb 25", label: "New GDPR requirement flagged by Legal", resolved: false },
     ],
     risks: [
-      { description: "New compliance requirement flagged in email thread", severity: "medium", source: "Email / Legal", nextAction: "Schedule 30-min review with Legal" },
-      { description: "SSO provider API changes scheduled for March", severity: "high", source: "Vendor notification email", nextAction: "Contact SSO vendor for migration guide" },
+      {
+        id: "auth-r1", description: "New compliance requirement flagged in email thread", severity: "medium", source: "Email / Legal",
+        nextAction: "Schedule 30-min review with Legal", type: "ai-detected", owner: "David P.", status: "open",
+        impact: "May require token storage redesign, adding 1–2 weeks", likelihood: "medium",
+        affectedMilestones: ["Compliance Audit"],
+        flaggedReason: "Legal team flagged a new GDPR requirement in an email thread that impacts token storage. This was cross-referenced with the existing architecture which stores tokens client-side.",
+        signals: [
+          { source: "Email", summary: "Legal flagged new GDPR Article 17 interpretation affecting token storage", date: "Feb 25" },
+          { source: "Meeting", summary: "Compliance review meeting surfaced gap in current auth architecture", date: "Feb 24" },
+        ],
+        sourceLinks: [
+          { label: "Legal email — GDPR token storage", type: "email", url: "#" },
+          { label: "Compliance review meeting notes", type: "meeting", url: "#" },
+        ],
+      },
+      {
+        id: "auth-r2", description: "SSO provider API changes scheduled for March", severity: "high", source: "Vendor notification email",
+        nextAction: "Contact SSO vendor for migration guide", type: "ai-detected", owner: "James K.", status: "open",
+        impact: "SSO integration cannot proceed until vendor releases updated API — blocks 2 enterprise deals", likelihood: "high",
+        affectedMilestones: ["SSO Integration", "MFA Implementation"],
+        flaggedReason: "Vendor notification email announced breaking API changes. Current SSO integration uses endpoints being deprecated. Timeline aligns with project's critical path.",
+        signals: [
+          { source: "Email", summary: "SSO vendor announced v3 API deprecation effective March 15", date: "Feb 20" },
+          { source: "Slack", summary: "James flagged vendor timeline conflict in #auth-team", date: "Feb 21" },
+        ],
+        sourceLinks: [
+          { label: "Vendor deprecation notice", type: "email", url: "#" },
+          { label: "Slack #auth-team — vendor discussion", type: "slack", url: "#" },
+        ],
+        notes: [{ author: "James K.", date: "Feb 22", text: "Reached out to vendor — they may offer early access to v4 API for migration." }],
+      },
     ],
     dataBreakdown: [
       { source: "Slack", items: 3, lastActivity: "15 min ago" },
@@ -309,7 +389,14 @@ const projectsData: Record<string, {
     ],
     blockers: [],
     risks: [
-      { description: "Accessibility audit deferred — post-launch remediation costs possible", severity: "low", source: "Email / PM", nextAction: "Budget for post-launch accessibility sprint" },
+      {
+        id: "mob-r1", description: "Accessibility audit deferred — post-launch remediation costs possible", severity: "low", source: "Email / PM",
+        nextAction: "Budget for post-launch accessibility sprint", type: "manual", owner: "Jade K.", status: "in-progress",
+        impact: "Potential compliance issues and remediation costs estimated at $15–25K", likelihood: "low",
+        sourceLinks: [
+          { label: "Sprint 11 decision notes", type: "doc", url: "#" },
+        ],
+      },
     ],
     dataBreakdown: [
       { source: "Slack", items: 2, lastActivity: "1 hr ago" },
@@ -368,8 +455,35 @@ const projectsData: Record<string, {
       { date: "Feb 24", label: "Vendor SDK v4.2 memory leak — PoC blocked", resolved: false },
     ],
     risks: [
-      { description: "Vendor SDK v4.2 memory leak blocks streaming PoC", severity: "high", source: "Slack #data-pipeline-eng", nextAction: "Evaluate Confluent Cloud or wait for SDK v4.3" },
-      { description: "Team needs 2 weeks Flink ramp-up before PoC", severity: "medium", source: "Meeting transcript", nextAction: "Evaluate contractor with Flink experience or managed Flink service" },
+      {
+        id: "pipe-r1", description: "Vendor SDK v4.2 memory leak blocks streaming PoC", severity: "high", source: "Slack #data-pipeline-eng",
+        nextAction: "Evaluate Confluent Cloud or wait for SDK v4.3", type: "ai-detected", owner: "Raj M.", status: "open",
+        impact: "Blocks entire streaming PoC — no progress possible until resolved", likelihood: "high",
+        affectedMilestones: ["Streaming PoC", "Pipeline Migration"],
+        flaggedReason: "Memory leak in vendor SDK v4.2 detected during PoC testing. 4 Slack threads over 6 days with increasing frustration. Vendor has acknowledged but no fix ETA.",
+        signals: [
+          { source: "Slack", summary: "Raj reported OOM errors in streaming PoC tests — traced to SDK v4.2 memory leak", date: "Feb 24" },
+          { source: "Jira", summary: "PIPE-155 'SDK memory leak' marked as blocker with no resolution", date: "Feb 25" },
+        ],
+        sourceLinks: [
+          { label: "JIRA PIPE-155 — SDK memory leak", type: "jira", url: "#" },
+          { label: "Slack #data-pipeline-eng — OOM discussion", type: "slack", url: "#" },
+          { label: "Vendor GitHub issue #4291", type: "doc", url: "#" },
+        ],
+      },
+      {
+        id: "pipe-r2", description: "Team needs 2 weeks Flink ramp-up before PoC", severity: "medium", source: "Meeting transcript",
+        nextAction: "Evaluate contractor with Flink experience or managed Flink service", type: "ai-detected", owner: "Chen L.", status: "open",
+        impact: "Delays PoC start by 2 weeks, compressing remaining timeline", likelihood: "medium",
+        affectedMilestones: ["Streaming PoC"],
+        flaggedReason: "Meeting transcript analysis shows team self-reported low Flink confidence. Combined with the SDK blocker, this creates a compounding delay risk.",
+        signals: [
+          { source: "Meeting", summary: "Team retro: 'None of us have production Flink experience'", date: "Feb 22" },
+        ],
+        sourceLinks: [
+          { label: "Architecture review meeting transcript", type: "meeting", url: "#" },
+        ],
+      },
     ],
     dataBreakdown: [
       { source: "Slack", items: 2, lastActivity: "3 days ago" },
