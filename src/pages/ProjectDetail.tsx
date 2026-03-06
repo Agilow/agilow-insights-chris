@@ -50,6 +50,7 @@ const projectsData: Record<string, {
   }[];
   milestones: { date: string; label: string; done: boolean }[];
   blockers: { date: string; label: string; resolved: boolean }[];
+  upcoming: { date: string; label: string; type: "task" | "milestone" | "gate-decision" | "review" | "meeting"; owner: string; atRisk?: boolean; overdue?: boolean }[];
   risks: EnhancedRisk[];
   dataBreakdown: { source: string; items: number; lastActivity: string }[];
 }> = {
