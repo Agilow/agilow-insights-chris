@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import { AppSidebar, MobileMenuButton } from "@/components/AppSidebar";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { RiskDetailDrawer, type EnhancedRisk } from "@/components/RiskDetailDrawer";
+import { RiskFeedback } from "@/components/RiskFeedback";
 
 const sourceIcons = {
   slack: { icon: Hash, label: "Slack" },
@@ -48,7 +50,7 @@ const projectsData: Record<string, {
   }[];
   milestones: { date: string; label: string; done: boolean }[];
   blockers: { date: string; label: string; resolved: boolean }[];
-  risks: { description: string; severity: "high" | "medium" | "low"; source: string; nextAction: string }[];
+  risks: EnhancedRisk[];
   dataBreakdown: { source: string; items: number; lastActivity: string }[];
 }> = {
   "project-phoenix": {
@@ -97,8 +99,34 @@ const projectsData: Record<string, {
     ],
     blockers: [],
     risks: [
-      { description: "Load testing environment not yet provisioned", severity: "medium", source: "JIRA PHX-201", nextAction: "DevOps to provision staging cluster this sprint" },
-      { description: "Third-party payment SDK update may break integration", severity: "low", source: "Slack #phoenix-eng", nextAction: "Pin SDK version and monitor release notes" },
+      {
+        id: "phx-r1", description: "Load testing environment not yet provisioned", severity: "medium", source: "JIRA PHX-201",
+        nextAction: "DevOps to provision staging cluster this sprint", type: "ai-detected", owner: "Lisa N.", status: "open",
+        impact: "Delays production deploy by 3–5 days if not resolved this sprint", likelihood: "medium",
+        affectedMilestones: ["Load Testing", "Production Deploy"],
+        flaggedReason: "Repeated mentions in 3 Slack threads over 5 days with no Jira status update. DevOps capacity appears stretched across 2 other projects.",
+        signals: [
+          { source: "Slack", summary: "Elena asked about load test env status 3 times in #phoenix-eng with no resolution", date: "Feb 28" },
+          { source: "Jira", summary: "PHX-201 'Provision load test env' has been in 'To Do' for 8 days", date: "Mar 1" },
+        ],
+        sourceLinks: [
+          { label: "JIRA PHX-201 — Provision load test env", type: "jira", url: "#" },
+          { label: "Slack #phoenix-eng — env discussion", type: "slack", url: "#" },
+        ],
+        notes: [{ author: "Elena R.", date: "Mar 1", text: "Lisa confirmed she can start provisioning Monday. Blocked by infra team capacity." }],
+      },
+      {
+        id: "phx-r2", description: "Third-party payment SDK update may break integration", severity: "low", source: "Slack #phoenix-eng",
+        nextAction: "Pin SDK version and monitor release notes", type: "ai-detected", owner: "James K.", status: "in-progress",
+        impact: "Could require 1–2 days of rework if SDK breaks during deploy window", likelihood: "low",
+        flaggedReason: "SDK vendor announced breaking changes in v5.0 release notes. Current integration uses deprecated endpoints.",
+        signals: [
+          { source: "Slack", summary: "James flagged SDK deprecation notice in #phoenix-eng", date: "Feb 26" },
+        ],
+        sourceLinks: [
+          { label: "Slack thread — SDK deprecation", type: "slack", url: "#" },
+        ],
+      },
     ],
     dataBreakdown: [
       { source: "Slack", items: 3, lastActivity: "2 min ago" },
@@ -156,8 +184,33 @@ const projectsData: Record<string, {
       { date: "Feb 18", label: "Vendor auth docs outdated — 3 teams blocked", resolved: false },
     ],
     risks: [
-      { description: "3 teams blocked on auth endpoint — vendor docs outdated", severity: "high", source: "Slack #api-team", nextAction: "Emergency sync with vendor support" },
-      { description: "Client SDK deadline conflicts with testing window", severity: "medium", source: "Email / PM sync", nextAction: "Negotiate SDK deadline with client team" },
+      {
+        id: "api-r1", description: "3 teams blocked on auth endpoint — vendor docs outdated", severity: "high", source: "Slack #api-team",
+        nextAction: "Emergency sync with vendor support", type: "ai-detected", owner: "Sarah W.", status: "open",
+        impact: "Blocks 3 downstream teams and delays client SDK milestone by 2+ weeks", likelihood: "high",
+        affectedMilestones: ["Endpoint Migration", "Client SDK Update"],
+        flaggedReason: "Negative sentiment detected across 5 Slack messages over 3 days. Three separate teams have reported being blocked. Jira blocker ticket remains unresolved for 10 days.",
+        signals: [
+          { source: "Slack", summary: "Team Alpha, Team Beta, and Team Gamma all reported auth endpoint failures in #api-team", date: "Feb 22–25" },
+          { source: "Jira", summary: "API-410 'Auth endpoint migration' blocked — vendor docs reference deprecated API", date: "Feb 20" },
+          { source: "Email", summary: "David escalated to vendor support with no response after 5 business days", date: "Feb 23" },
+        ],
+        sourceLinks: [
+          { label: "JIRA API-410 — Auth endpoint blocked", type: "jira", url: "#" },
+          { label: "Slack #api-team — blocker thread", type: "slack", url: "#" },
+          { label: "Vendor support escalation email", type: "email", url: "#" },
+        ],
+        notes: [{ author: "David P.", date: "Feb 26", text: "Vendor acknowledged issue, ETA for updated docs is March 3." }],
+      },
+      {
+        id: "api-r2", description: "Client SDK deadline conflicts with testing window", severity: "medium", source: "Email / PM sync",
+        nextAction: "Negotiate SDK deadline with client team", type: "manual", owner: "David P.", status: "open",
+        impact: "May force skipping integration tests, increasing production risk", likelihood: "medium",
+        affectedMilestones: ["Client SDK Update"],
+        sourceLinks: [
+          { label: "PM sync meeting notes — deadline discussion", type: "meeting", url: "#" },
+        ],
+      },
     ],
     dataBreakdown: [
       { source: "Slack", items: 3, lastActivity: "5 min ago" },
@@ -256,8 +309,37 @@ const projectsData: Record<string, {
       { date: "Feb 25", label: "New GDPR requirement flagged by Legal", resolved: false },
     ],
     risks: [
-      { description: "New compliance requirement flagged in email thread", severity: "medium", source: "Email / Legal", nextAction: "Schedule 30-min review with Legal" },
-      { description: "SSO provider API changes scheduled for March", severity: "high", source: "Vendor notification email", nextAction: "Contact SSO vendor for migration guide" },
+      {
+        id: "auth-r1", description: "New compliance requirement flagged in email thread", severity: "medium", source: "Email / Legal",
+        nextAction: "Schedule 30-min review with Legal", type: "ai-detected", owner: "David P.", status: "open",
+        impact: "May require token storage redesign, adding 1–2 weeks", likelihood: "medium",
+        affectedMilestones: ["Compliance Audit"],
+        flaggedReason: "Legal team flagged a new GDPR requirement in an email thread that impacts token storage. This was cross-referenced with the existing architecture which stores tokens client-side.",
+        signals: [
+          { source: "Email", summary: "Legal flagged new GDPR Article 17 interpretation affecting token storage", date: "Feb 25" },
+          { source: "Meeting", summary: "Compliance review meeting surfaced gap in current auth architecture", date: "Feb 24" },
+        ],
+        sourceLinks: [
+          { label: "Legal email — GDPR token storage", type: "email", url: "#" },
+          { label: "Compliance review meeting notes", type: "meeting", url: "#" },
+        ],
+      },
+      {
+        id: "auth-r2", description: "SSO provider API changes scheduled for March", severity: "high", source: "Vendor notification email",
+        nextAction: "Contact SSO vendor for migration guide", type: "ai-detected", owner: "James K.", status: "open",
+        impact: "SSO integration cannot proceed until vendor releases updated API — blocks 2 enterprise deals", likelihood: "high",
+        affectedMilestones: ["SSO Integration", "MFA Implementation"],
+        flaggedReason: "Vendor notification email announced breaking API changes. Current SSO integration uses endpoints being deprecated. Timeline aligns with project's critical path.",
+        signals: [
+          { source: "Email", summary: "SSO vendor announced v3 API deprecation effective March 15", date: "Feb 20" },
+          { source: "Slack", summary: "James flagged vendor timeline conflict in #auth-team", date: "Feb 21" },
+        ],
+        sourceLinks: [
+          { label: "Vendor deprecation notice", type: "email", url: "#" },
+          { label: "Slack #auth-team — vendor discussion", type: "slack", url: "#" },
+        ],
+        notes: [{ author: "James K.", date: "Feb 22", text: "Reached out to vendor — they may offer early access to v4 API for migration." }],
+      },
     ],
     dataBreakdown: [
       { source: "Slack", items: 3, lastActivity: "15 min ago" },
@@ -307,7 +389,14 @@ const projectsData: Record<string, {
     ],
     blockers: [],
     risks: [
-      { description: "Accessibility audit deferred — post-launch remediation costs possible", severity: "low", source: "Email / PM", nextAction: "Budget for post-launch accessibility sprint" },
+      {
+        id: "mob-r1", description: "Accessibility audit deferred — post-launch remediation costs possible", severity: "low", source: "Email / PM",
+        nextAction: "Budget for post-launch accessibility sprint", type: "manual", owner: "Jade K.", status: "in-progress",
+        impact: "Potential compliance issues and remediation costs estimated at $15–25K", likelihood: "low",
+        sourceLinks: [
+          { label: "Sprint 11 decision notes", type: "doc", url: "#" },
+        ],
+      },
     ],
     dataBreakdown: [
       { source: "Slack", items: 2, lastActivity: "1 hr ago" },
@@ -366,8 +455,35 @@ const projectsData: Record<string, {
       { date: "Feb 24", label: "Vendor SDK v4.2 memory leak — PoC blocked", resolved: false },
     ],
     risks: [
-      { description: "Vendor SDK v4.2 memory leak blocks streaming PoC", severity: "high", source: "Slack #data-pipeline-eng", nextAction: "Evaluate Confluent Cloud or wait for SDK v4.3" },
-      { description: "Team needs 2 weeks Flink ramp-up before PoC", severity: "medium", source: "Meeting transcript", nextAction: "Evaluate contractor with Flink experience or managed Flink service" },
+      {
+        id: "pipe-r1", description: "Vendor SDK v4.2 memory leak blocks streaming PoC", severity: "high", source: "Slack #data-pipeline-eng",
+        nextAction: "Evaluate Confluent Cloud or wait for SDK v4.3", type: "ai-detected", owner: "Raj M.", status: "open",
+        impact: "Blocks entire streaming PoC — no progress possible until resolved", likelihood: "high",
+        affectedMilestones: ["Streaming PoC", "Pipeline Migration"],
+        flaggedReason: "Memory leak in vendor SDK v4.2 detected during PoC testing. 4 Slack threads over 6 days with increasing frustration. Vendor has acknowledged but no fix ETA.",
+        signals: [
+          { source: "Slack", summary: "Raj reported OOM errors in streaming PoC tests — traced to SDK v4.2 memory leak", date: "Feb 24" },
+          { source: "Jira", summary: "PIPE-155 'SDK memory leak' marked as blocker with no resolution", date: "Feb 25" },
+        ],
+        sourceLinks: [
+          { label: "JIRA PIPE-155 — SDK memory leak", type: "jira", url: "#" },
+          { label: "Slack #data-pipeline-eng — OOM discussion", type: "slack", url: "#" },
+          { label: "Vendor GitHub issue #4291", type: "doc", url: "#" },
+        ],
+      },
+      {
+        id: "pipe-r2", description: "Team needs 2 weeks Flink ramp-up before PoC", severity: "medium", source: "Meeting transcript",
+        nextAction: "Evaluate contractor with Flink experience or managed Flink service", type: "ai-detected", owner: "Chen L.", status: "open",
+        impact: "Delays PoC start by 2 weeks, compressing remaining timeline", likelihood: "medium",
+        affectedMilestones: ["Streaming PoC"],
+        flaggedReason: "Meeting transcript analysis shows team self-reported low Flink confidence. Combined with the SDK blocker, this creates a compounding delay risk.",
+        signals: [
+          { source: "Meeting", summary: "Team retro: 'None of us have production Flink experience'", date: "Feb 22" },
+        ],
+        sourceLinks: [
+          { label: "Architecture review meeting transcript", type: "meeting", url: "#" },
+        ],
+      },
     ],
     dataBreakdown: [
       { source: "Slack", items: 2, lastActivity: "3 days ago" },
@@ -395,27 +511,7 @@ const riskSeverity = {
 
 type TimelineFilter = "all" | "decision" | "milestone" | "blocker" | "other";
 
-// ─── Risk inline feedback ──────────────────────────────────────────────────
-type FbState = "idle" | "up" | "down" | "submitted";
-function InlineRiskFeedback() {
-  const [state, setState] = useState<FbState>("idle");
-  const [text, setText] = useState("");
-  if (state === "submitted") return <span className="text-[10px] text-muted-foreground">Feedback saved.</span>;
-  if (state === "up") return <span className="text-[10px] text-muted-foreground">Thanks — noted.</span>;
-  return (
-    <div className="flex items-center gap-1">
-      {state === "idle" && (
-        <>
-          <button onClick={(e) => { e.stopPropagation(); setState("up"); }} className="p-0.5 rounded hover:bg-secondary transition-colors text-muted-foreground/40 hover:text-muted-foreground"><ThumbsUp className="w-3 h-3" /></button>
-          <button onClick={(e) => { e.stopPropagation(); setState("down"); }} className="p-0.5 rounded hover:bg-secondary transition-colors text-muted-foreground/40 hover:text-muted-foreground"><ThumbsDown className="w-3 h-3" /></button>
-        </>
-      )}
-      {state === "down" && (
-        <span className="text-[10px] text-muted-foreground italic">We'll review this risk.</span>
-      )}
-    </div>
-  );
-}
+// InlineRiskFeedback removed — now using RiskFeedback component
 
 // ─── Timeline edit modal ───────────────────────────────────────────────────
 type TimelineEntry = {
@@ -602,6 +698,7 @@ const ProjectDetail = () => {
   const [showSnapshotEdit, setShowSnapshotEdit] = useState(false);
   const [snapshotText, setSnapshotText] = useState(project?.snapshot || "");
   const [snapshotSteps, setSnapshotSteps] = useState(project?.remainingSteps || []);
+  const [selectedRisk, setSelectedRisk] = useState<EnhancedRisk | null>(null);
   const [snapshotLastEdited] = useState("Elena R. · 2 min ago");
 
   if (!project) {
@@ -855,6 +952,22 @@ const ProjectDetail = () => {
                         {project.risks.length} risk{project.risks.length !== 1 ? "s" : ""}
                       </span>
                     </div>
+                    {project.risks.length > 0 && (
+                      <p className="text-[10px] text-muted-foreground mb-2">
+                        {project.risks.filter(r => r.type === "ai-detected").length > 0 && (
+                          <span className="inline-flex items-center gap-0.5 mr-2">
+                            <Sparkles className="w-3 h-3 text-accent" />
+                            {project.risks.filter(r => r.type === "ai-detected").length} AI-detected
+                          </span>
+                        )}
+                        {project.risks.filter(r => r.type === "manual").length > 0 && (
+                          <span className="inline-flex items-center gap-0.5">
+                            <Users className="w-3 h-3 text-muted-foreground" />
+                            {project.risks.filter(r => r.type === "manual").length} team-entered
+                          </span>
+                        )}
+                      </p>
+                    )}
                     {project.status === "on-track" && project.risks.length > 0 && (
                       <p className="text-[10px] text-muted-foreground mb-3 flex items-center gap-1">
                         <ShieldCheck className="w-3 h-3 text-status-success" />
@@ -868,16 +981,29 @@ const ProjectDetail = () => {
                       </p>
                     ) : (
                       <div className="space-y-3 mt-2">
-                        {project.risks.map((r, i) => (
-                          <div key={i} className="flex items-start gap-2">
+                        {project.risks.map((r) => (
+                          <div
+                            key={r.id}
+                            onClick={() => setSelectedRisk(r)}
+                            className="flex items-start gap-2 cursor-pointer rounded-lg p-2 -mx-2 hover:bg-secondary/50 transition-colors"
+                          >
                             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 mt-0.5 ${riskSeverity[r.severity]}`}>
                               {r.severity.charAt(0).toUpperCase() + r.severity.slice(1)}
                             </span>
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs text-foreground">{r.description}</p>
-                              <p className="text-[10px] text-muted-foreground mt-0.5">{r.nextAction}</p>
+                              <div className="flex items-center gap-1.5 mb-0.5">
+                                <p className="text-xs text-foreground">{r.description}</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {r.type === "ai-detected" && (
+                                  <span className="inline-flex items-center gap-0.5 text-[9px] text-accent">
+                                    <Sparkles className="w-2.5 h-2.5" /> AI
+                                  </span>
+                                )}
+                                <p className="text-[10px] text-muted-foreground">{r.owner} · {r.status}</p>
+                              </div>
                             </div>
-                            <InlineRiskFeedback />
+                            <RiskFeedback riskId={r.id} variant="inline" />
                           </div>
                         ))}
                       </div>
@@ -1042,27 +1168,60 @@ const ProjectDetail = () => {
                     <p className="text-sm text-muted-foreground mt-1">Agilow hasn't detected any risks for this project yet.</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {project.risks.map((r, i) => (
-                      <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
-                        className="glass-card p-5">
-                        <div className="flex items-start gap-3">
-                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border shrink-0 mt-0.5 ${riskSeverity[r.severity]}`}>
-                            {r.severity.charAt(0).toUpperCase() + r.severity.slice(1)}
-                          </span>
-                          <div className="flex-1">
-                            <p className="text-sm font-semibold text-foreground">{r.description}</p>
-                            <p className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1">
-                              <GitBranch className="w-3 h-3" />{r.source}
-                            </p>
-                            <div className="mt-2 p-2.5 rounded-lg bg-secondary/50 border border-border text-xs text-muted-foreground">
-                              <span className="font-medium text-foreground">Next action: </span>{r.nextAction}
+                  <>
+                    {/* AI vs Manual legend */}
+                    <div className="flex items-center gap-4 mb-4">
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <Sparkles className="w-3.5 h-3.5 text-accent" /> AI-detected risks
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <Users className="w-3.5 h-3.5 text-muted-foreground" /> Team-entered risks
+                      </span>
+                    </div>
+                    <div className="space-y-3">
+                      {project.risks.map((r, i) => (
+                        <motion.div
+                          key={r.id}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.06 }}
+                          onClick={() => setSelectedRisk(r)}
+                          className="glass-card p-5 cursor-pointer hover:ring-1 hover:ring-accent/30 transition-all"
+                        >
+                          <div className="flex items-start gap-3">
+                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border shrink-0 mt-0.5 ${riskSeverity[r.severity]}`}>
+                              {r.severity.charAt(0).toUpperCase() + r.severity.slice(1)}
+                            </span>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 flex-wrap mb-1">
+                                <p className="text-sm font-semibold text-foreground">{r.description}</p>
+                                {r.type === "ai-detected" ? (
+                                  <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-accent bg-accent/10 border border-accent/20 px-1.5 py-0.5 rounded-full">
+                                    <Sparkles className="w-2.5 h-2.5" /> AI
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-muted-foreground bg-secondary border border-border px-1.5 py-0.5 rounded-full">
+                                    <Users className="w-2.5 h-2.5" /> Manual
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3 text-[11px] text-muted-foreground mb-2">
+                                <span className="flex items-center gap-1"><GitBranch className="w-3 h-3" />{r.source}</span>
+                                <span>Owner: {r.owner}</span>
+                                <span className="capitalize">{r.status}</span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <div className="p-2.5 rounded-lg bg-secondary/50 border border-border text-xs text-muted-foreground flex-1 mr-3">
+                                  <span className="font-medium text-foreground">Next action: </span>{r.nextAction}
+                                </div>
+                                <RiskFeedback riskId={r.id} variant="inline" />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </>
                 )}
               </motion.div>
             )}
@@ -1094,6 +1253,13 @@ const ProjectDetail = () => {
             onSave={(text, steps) => { setSnapshotText(text); setSnapshotSteps(steps); }}
             onClose={() => setShowSnapshotEdit(false)}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Risk detail drawer */}
+      <AnimatePresence>
+        {selectedRisk && (
+          <RiskDetailDrawer risk={selectedRisk} onClose={() => setSelectedRisk(null)} />
         )}
       </AnimatePresence>
     </div>
