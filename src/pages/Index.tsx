@@ -22,6 +22,7 @@ import {
   Filter,
   ChevronDown,
   RefreshCw,
+  ShieldAlert,
 } from "lucide-react";
 import { AppSidebar, MobileMenuButton } from "@/components/AppSidebar";
 import { ChatPanel } from "@/components/ChatPanel";
@@ -491,13 +492,20 @@ const Index = () => {
                     {filteredProjects.map((p, i) => {
                       const st = statusConfig[p.status];
                       const riskCount = allRisks.filter(r => r.projectSlug === p.slug && (r.severity === "critical" || r.severity === "high")).length;
+                      const totalRiskCount = allRisks.filter(r => r.projectSlug === p.slug).length;
                       return (
                         <motion.div
                           key={p.slug}
                           initial={{ opacity: 0, y: 12 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.05 }}
-                          onClick={() => navigate(`/project/${p.slug}`)}
+                          onClick={() => {
+                            if (p.status === "at-risk" || p.status === "blocked") {
+                              navigate(`/project/${p.slug}#status-explanation`);
+                            } else {
+                              navigate(`/project/${p.slug}`);
+                            }
+                          }}
                           className="glass-card p-5 hover:shadow-card cursor-pointer group transition-all"
                         >
                           {/* Card top row */}
@@ -509,9 +517,15 @@ const Index = () => {
                                 <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />Due {p.dueDate}</span>
                               </div>
                             </div>
-                            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border shrink-0 ${st.chip}`}>
-                              <st.icon className="w-3 h-3" />{st.label}
-                            </span>
+                            {/* Status badge with tooltip */}
+                            <div className="relative group/status shrink-0">
+                              <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border ${st.chip}`}>
+                                <st.icon className="w-3 h-3" />{st.label}
+                              </span>
+                              <span className="absolute -bottom-8 right-0 text-[9px] bg-popover border border-border text-muted-foreground px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover/status:opacity-100 transition-opacity pointer-events-none z-50 shadow-sm">
+                                Overall status based on schedule, critical issues &amp; unresolved risks
+                              </span>
+                            </div>
                           </div>
 
                           {/* Progress */}
@@ -537,14 +551,28 @@ const Index = () => {
                             </div>
                           </div>
 
-                          {/* Footer */}
+                          {/* Footer — signals + separate risk indicator */}
                           <div className="flex items-center justify-between text-xs text-muted-foreground">
                             <span className="truncate opacity-70">{p.signals}</span>
                             <div className="flex items-center gap-2 shrink-0 ml-2">
-                              {riskCount > 0 && (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-status-danger bg-status-danger/10 border border-status-danger/20 px-2 py-0.5 rounded-full">
-                                  <AlertTriangle className="w-2.5 h-2.5" />{riskCount} risk{riskCount > 1 ? "s" : ""}
-                                </span>
+                              {/* Risk indicator — separate from status */}
+                              {totalRiskCount > 0 && (
+                                <div className="relative group/risk">
+                                  <span
+                                    onClick={(e) => { e.stopPropagation(); navigate(`/project/${p.slug}#risks-identified`); }}
+                                    className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full border cursor-pointer hover:opacity-80 transition-opacity ${
+                                      riskCount > 0
+                                        ? "text-status-warning bg-status-warning/10 border-status-warning/20"
+                                        : "text-muted-foreground bg-secondary border-border"
+                                    }`}
+                                  >
+                                    <ShieldAlert className="w-2.5 h-2.5" />
+                                    {totalRiskCount} risk{totalRiskCount > 1 ? "s" : ""}
+                                  </span>
+                                  <span className="absolute -bottom-8 right-0 text-[9px] bg-popover border border-border text-muted-foreground px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover/risk:opacity-100 transition-opacity pointer-events-none z-50 shadow-sm">
+                                    Risks identified · project can still be on track
+                                  </span>
+                                </div>
                               )}
                               <span className="text-[10px] opacity-60">{p.lastActivity}</span>
                             </div>

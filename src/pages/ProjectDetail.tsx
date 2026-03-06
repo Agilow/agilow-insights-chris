@@ -5,7 +5,7 @@ import {
   ArrowLeft, CheckCircle2, AlertTriangle, Clock, Hash, TicketCheck, Mail,
   Video, Users, Calendar, GitBranch, Flag, AlertCircle, Info, ExternalLink,
   Sparkles, Filter, ChevronDown, TrendingUp, TrendingDown, Minus,
-  ThumbsUp, ThumbsDown, Pencil, X, ChevronUp, Save,
+  ThumbsUp, ThumbsDown, Pencil, X, ChevronUp, Save, ShieldAlert, ShieldCheck,
 } from "lucide-react";
 import { AppSidebar, MobileMenuButton } from "@/components/AppSidebar";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -40,6 +40,7 @@ const projectsData: Record<string, {
   remainingSteps: { label: string; est: string }[];
   estimatedCompletion: string;
   whyThisProject: string;
+  statusExplanation?: { summary: string; causes: { label: string; type: "milestone" | "risk" | "blocker"; link?: string }[] };
   decisions: {
     date: string; title: string; who: string; rationale: string;
     flagged: boolean; sources: string[]; scopeChange: string;
@@ -115,6 +116,14 @@ const projectsData: Record<string, {
     stage: "Build",
     lastActivity: "5 min ago",
     risk: "high",
+    statusExplanation: {
+      summary: "Three downstream teams are blocked on an auth endpoint due to outdated vendor documentation, and the endpoint migration milestone is 10+ days late.",
+      causes: [
+        { label: "Milestone 'Endpoint Migration' is 10 days overdue (due Feb 25)", type: "milestone" },
+        { label: "Critical risk: 3 teams blocked on auth endpoint — vendor docs outdated", type: "risk" },
+        { label: "Blocker: Vendor auth docs outdated — 3 teams blocked (unresolved)", type: "blocker" },
+      ],
+    },
     team: [
       { name: "David P.", role: "PM", isOwner: true },
       { name: "Sarah W.", role: "Lead Engineer" },
@@ -206,6 +215,14 @@ const projectsData: Record<string, {
     stage: "Build",
     lastActivity: "15 min ago",
     risk: "medium",
+    statusExplanation: {
+      summary: "SSO integration is stalled pending vendor API changes, and a new GDPR compliance requirement has created a second blocking dependency.",
+      causes: [
+        { label: "Blocker: SSO provider API changes — integration stalled (unresolved)", type: "blocker" },
+        { label: "Blocker: New GDPR requirement flagged by Legal (unresolved)", type: "blocker" },
+        { label: "Milestone 'SSO Integration' overdue (due Feb 15)", type: "milestone" },
+      ],
+    },
     team: [
       { name: "James K.", role: "Lead Engineer", isOwner: true },
       { name: "Alex T.", role: "Backend" },
@@ -309,6 +326,14 @@ const projectsData: Record<string, {
     stage: "Design",
     lastActivity: "3 days ago",
     risk: "high",
+    statusExplanation: {
+      summary: "Streaming PoC is blocked by a vendor SDK memory leak, and the team needs 2 weeks of Flink training before meaningful progress can resume.",
+      causes: [
+        { label: "Blocker: Vendor SDK v4.2 memory leak — PoC blocked (unresolved)", type: "blocker" },
+        { label: "High risk: Team needs 2 weeks Flink ramp-up before PoC", type: "risk" },
+        { label: "Milestone 'Streaming PoC' at risk (due Mar 5)", type: "milestone" },
+      ],
+    },
     team: [
       { name: "Raj M.", role: "Lead Engineer", isOwner: true },
       { name: "Chen L.", role: "Data Engineer" },
@@ -691,6 +716,35 @@ const ProjectDetail = () => {
                 </div>
               </div>
             </div>
+
+            {/* ── STATUS EXPLANATION (at-risk / blocked only) ─────────── */}
+            {project.statusExplanation && (project.status === "at-risk" || project.status === "blocked") && (
+              <div id="status-explanation" className="glass-card p-4 sm:p-5 border-l-4 border-l-status-danger mt-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle className="w-4 h-4 text-status-danger" />
+                  <h3 className="font-semibold text-foreground">
+                    Why this project is {st.label}
+                  </h3>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                  {project.statusExplanation.summary}
+                </p>
+                <div className="space-y-1.5">
+                  {project.statusExplanation.causes.map((cause, ci) => (
+                    <div key={ci} className="flex items-center gap-2 text-xs">
+                      <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+                        cause.type === "milestone" ? "bg-status-warning/10" : cause.type === "blocker" ? "bg-status-danger/10" : "bg-status-warning/10"
+                      }`}>
+                        {cause.type === "milestone" ? <Flag className="w-3 h-3 text-status-warning" /> :
+                         cause.type === "blocker" ? <Clock className="w-3 h-3 text-status-danger" /> :
+                         <AlertTriangle className="w-3 h-3 text-status-warning" />}
+                      </span>
+                      <span className="text-foreground">{cause.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
 
           {/* Tabs */}
@@ -792,11 +846,28 @@ const ProjectDetail = () => {
 
                 {/* Right column */}
                 <div className="space-y-4">
-                  {/* Top Risks */}
-                  {project.risks.length > 0 && (
-                    <div className="glass-card p-5">
-                      <h3 className="font-semibold text-foreground mb-3">Top Risks</h3>
-                      <div className="space-y-3">
+                  {/* Risks Identified — separate from project status */}
+                  <div id="risks-identified" className="glass-card p-5">
+                    <div className="flex items-center gap-2 mb-1">
+                      <ShieldAlert className="w-4 h-4 text-status-warning" />
+                      <h3 className="font-semibold text-foreground">Risks Identified</h3>
+                      <span className="text-[10px] font-medium text-muted-foreground bg-secondary border border-border px-2 py-0.5 rounded-full">
+                        {project.risks.length} risk{project.risks.length !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                    {project.status === "on-track" && project.risks.length > 0 && (
+                      <p className="text-[10px] text-muted-foreground mb-3 flex items-center gap-1">
+                        <ShieldCheck className="w-3 h-3 text-status-success" />
+                        Risks are identified but managed — project remains On Track.
+                      </p>
+                    )}
+                    {project.risks.length === 0 ? (
+                      <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                        <ShieldCheck className="w-3 h-3 text-status-success" />
+                        No open risks detected for this project.
+                      </p>
+                    ) : (
+                      <div className="space-y-3 mt-2">
                         {project.risks.map((r, i) => (
                           <div key={i} className="flex items-start gap-2">
                             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 mt-0.5 ${riskSeverity[r.severity]}`}>
@@ -810,9 +881,11 @@ const ProjectDetail = () => {
                           </div>
                         ))}
                       </div>
-                      <button onClick={() => setActiveTab("risks")} className="mt-3 text-xs text-accent hover:underline">View all risks →</button>
-                    </div>
-                  )}
+                    )}
+                    {project.risks.length > 0 && (
+                      <button onClick={() => setActiveTab("risks")} className="mt-3 text-xs text-accent hover:underline">View full risk details →</button>
+                    )}
+                  </div>
 
                   {/* Milestones */}
                   <div className="glass-card p-5">
