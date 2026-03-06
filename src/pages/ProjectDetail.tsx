@@ -40,6 +40,7 @@ const projectsData: Record<string, {
   remainingSteps: { label: string; est: string }[];
   estimatedCompletion: string;
   whyThisProject: string;
+  statusExplanation?: { summary: string; causes: { label: string; type: "milestone" | "risk" | "blocker"; link?: string }[] };
   decisions: {
     date: string; title: string; who: string; rationale: string;
     flagged: boolean; sources: string[]; scopeChange: string;
