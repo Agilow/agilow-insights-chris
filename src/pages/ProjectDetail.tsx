@@ -1263,6 +1263,7 @@ const ProjectDetail = () => {
         )}
       </AnimatePresence>
     </div>
+  );
 };
 
 export default ProjectDetail;
