@@ -116,6 +116,14 @@ const projectsData: Record<string, {
     stage: "Build",
     lastActivity: "5 min ago",
     risk: "high",
+    statusExplanation: {
+      summary: "Three downstream teams are blocked on an auth endpoint due to outdated vendor documentation, and the endpoint migration milestone is 10+ days late.",
+      causes: [
+        { label: "Milestone 'Endpoint Migration' is 10 days overdue (due Feb 25)", type: "milestone" },
+        { label: "Critical risk: 3 teams blocked on auth endpoint — vendor docs outdated", type: "risk" },
+        { label: "Blocker: Vendor auth docs outdated — 3 teams blocked (unresolved)", type: "blocker" },
+      ],
+    },
     team: [
       { name: "David P.", role: "PM", isOwner: true },
       { name: "Sarah W.", role: "Lead Engineer" },
