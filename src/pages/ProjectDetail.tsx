@@ -215,6 +215,14 @@ const projectsData: Record<string, {
     stage: "Build",
     lastActivity: "15 min ago",
     risk: "medium",
+    statusExplanation: {
+      summary: "SSO integration is stalled pending vendor API changes, and a new GDPR compliance requirement has created a second blocking dependency.",
+      causes: [
+        { label: "Blocker: SSO provider API changes — integration stalled (unresolved)", type: "blocker" },
+        { label: "Blocker: New GDPR requirement flagged by Legal (unresolved)", type: "blocker" },
+        { label: "Milestone 'SSO Integration' overdue (due Feb 15)", type: "milestone" },
+      ],
+    },
     team: [
       { name: "James K.", role: "Lead Engineer", isOwner: true },
       { name: "Alex T.", role: "Backend" },
