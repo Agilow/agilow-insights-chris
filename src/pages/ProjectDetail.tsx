@@ -846,11 +846,28 @@ const ProjectDetail = () => {
 
                 {/* Right column */}
                 <div className="space-y-4">
-                  {/* Top Risks */}
-                  {project.risks.length > 0 && (
-                    <div className="glass-card p-5">
-                      <h3 className="font-semibold text-foreground mb-3">Top Risks</h3>
-                      <div className="space-y-3">
+                  {/* Risks Identified — separate from project status */}
+                  <div id="risks-identified" className="glass-card p-5">
+                    <div className="flex items-center gap-2 mb-1">
+                      <ShieldAlert className="w-4 h-4 text-status-warning" />
+                      <h3 className="font-semibold text-foreground">Risks Identified</h3>
+                      <span className="text-[10px] font-medium text-muted-foreground bg-secondary border border-border px-2 py-0.5 rounded-full">
+                        {project.risks.length} risk{project.risks.length !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                    {project.status === "on-track" && project.risks.length > 0 && (
+                      <p className="text-[10px] text-muted-foreground mb-3 flex items-center gap-1">
+                        <ShieldCheck className="w-3 h-3 text-status-success" />
+                        Risks are identified but managed — project remains On Track.
+                      </p>
+                    )}
+                    {project.risks.length === 0 ? (
+                      <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                        <ShieldCheck className="w-3 h-3 text-status-success" />
+                        No open risks detected for this project.
+                      </p>
+                    ) : (
+                      <div className="space-y-3 mt-2">
                         {project.risks.map((r, i) => (
                           <div key={i} className="flex items-start gap-2">
                             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border shrink-0 mt-0.5 ${riskSeverity[r.severity]}`}>
@@ -864,9 +881,11 @@ const ProjectDetail = () => {
                           </div>
                         ))}
                       </div>
-                      <button onClick={() => setActiveTab("risks")} className="mt-3 text-xs text-accent hover:underline">View all risks →</button>
-                    </div>
-                  )}
+                    )}
+                    {project.risks.length > 0 && (
+                      <button onClick={() => setActiveTab("risks")} className="mt-3 text-xs text-accent hover:underline">View full risk details →</button>
+                    )}
+                  </div>
 
                   {/* Milestones */}
                   <div className="glass-card p-5">
