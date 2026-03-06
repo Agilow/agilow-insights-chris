@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import { AppSidebar, MobileMenuButton } from "@/components/AppSidebar";
 import { ChatPanel } from "@/components/ChatPanel";
+import { RiskResourcesPanel } from "@/components/dashboard/RiskResourcesPanel";
+import { PlanManagerPanel } from "@/components/dashboard/PlanManagerPanel";
 import { useNavigate } from "react-router-dom";
 
 // ─── Project Data ───────────────────────────────────────────────────────────
@@ -256,6 +258,11 @@ const Index = () => {
   const [lastSynced, setLastSynced] = useState<string | null>(null);
   const [thinkingDone, setThinkingDone] = useState(false);
   const [syncCount, setSyncCount] = useState(0);
+
+  // Dashboard widget config
+  const [riskWidgets, setRiskWidgets] = useState({ riskRegister: true, riskEvolution: true, resourceLoad: true });
+  const [showPlanManager, setShowPlanManager] = useState(true);
+  const [showDailyView, setShowDailyView] = useState(false);
 
   const handleRefresh = async () => {
     if (isSyncing) return;
@@ -688,6 +695,32 @@ const Index = () => {
               )}
             </AnimatePresence>
           </motion.div>
+
+          {/* ── Risk & Resources Panel ─────────────────────────────────── */}
+          <RiskResourcesPanel
+            visibleWidgets={riskWidgets}
+            onToggleWidget={(key) => setRiskWidgets(prev => ({ ...prev, [key]: !prev[key] }))}
+          />
+
+          {/* ── Plan Manager ──────────────────────────────────────────── */}
+          {showPlanManager && <PlanManagerPanel showDaily={showDailyView} />}
+
+          {/* Dashboard config footer */}
+          <div className="flex items-center gap-2 flex-wrap text-[10px] text-muted-foreground pt-2">
+            <span className="uppercase tracking-wider font-semibold">Dashboard widgets:</span>
+            <button
+              onClick={() => setShowPlanManager(!showPlanManager)}
+              className={`px-2.5 py-1 rounded-full font-medium border transition-colors ${showPlanManager ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-transparent hover:bg-secondary/70"}`}
+            >
+              Plan Manager
+            </button>
+            <button
+              onClick={() => setShowDailyView(!showDailyView)}
+              className={`px-2.5 py-1 rounded-full font-medium border transition-colors ${showDailyView ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-transparent hover:bg-secondary/70"}`}
+            >
+              Daily View
+            </button>
+          </div>
 
         </main>
       </div>
