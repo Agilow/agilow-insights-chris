@@ -909,7 +909,7 @@ const ProjectDetail = () => {
                     : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {tab === "timeline" ? "Timeline & Decisions" : tab === "risks" ? `Risks (${project.risks.length} open)` : "Overview"}
+                {tab === "timeline" ? "Timeline" : tab === "risks" ? `Risks (${project.risks.length} open)` : "Overview"}
               </button>
             ))}
           </div>
