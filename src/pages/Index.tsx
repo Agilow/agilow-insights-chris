@@ -259,6 +259,11 @@ const Index = () => {
   const [thinkingDone, setThinkingDone] = useState(false);
   const [syncCount, setSyncCount] = useState(0);
 
+  // Dashboard widget config
+  const [riskWidgets, setRiskWidgets] = useState({ riskRegister: true, riskEvolution: true, resourceLoad: true });
+  const [showPlanManager, setShowPlanManager] = useState(true);
+  const [showDailyView, setShowDailyView] = useState(false);
+
   const handleRefresh = async () => {
     if (isSyncing) return;
     setIsSyncing(true);
