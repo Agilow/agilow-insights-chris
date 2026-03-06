@@ -696,6 +696,32 @@ const Index = () => {
             </AnimatePresence>
           </motion.div>
 
+          {/* ── Risk & Resources Panel ─────────────────────────────────── */}
+          <RiskResourcesPanel
+            visibleWidgets={riskWidgets}
+            onToggleWidget={(key) => setRiskWidgets(prev => ({ ...prev, [key]: !prev[key] }))}
+          />
+
+          {/* ── Plan Manager ──────────────────────────────────────────── */}
+          {showPlanManager && <PlanManagerPanel showDaily={showDailyView} />}
+
+          {/* Dashboard config footer */}
+          <div className="flex items-center gap-2 flex-wrap text-[10px] text-muted-foreground pt-2">
+            <span className="uppercase tracking-wider font-semibold">Dashboard widgets:</span>
+            <button
+              onClick={() => setShowPlanManager(!showPlanManager)}
+              className={`px-2.5 py-1 rounded-full font-medium border transition-colors ${showPlanManager ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-transparent hover:bg-secondary/70"}`}
+            >
+              Plan Manager
+            </button>
+            <button
+              onClick={() => setShowDailyView(!showDailyView)}
+              className={`px-2.5 py-1 rounded-full font-medium border transition-colors ${showDailyView ? "bg-primary text-primary-foreground border-primary" : "bg-secondary text-secondary-foreground border-transparent hover:bg-secondary/70"}`}
+            >
+              Daily View
+            </button>
+          </div>
+
         </main>
       </div>
 
