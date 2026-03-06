@@ -326,6 +326,14 @@ const projectsData: Record<string, {
     stage: "Design",
     lastActivity: "3 days ago",
     risk: "high",
+    statusExplanation: {
+      summary: "Streaming PoC is blocked by a vendor SDK memory leak, and the team needs 2 weeks of Flink training before meaningful progress can resume.",
+      causes: [
+        { label: "Blocker: Vendor SDK v4.2 memory leak — PoC blocked (unresolved)", type: "blocker" },
+        { label: "High risk: Team needs 2 weeks Flink ramp-up before PoC", type: "risk" },
+        { label: "Milestone 'Streaming PoC' at risk (due Mar 5)", type: "milestone" },
+      ],
+    },
     team: [
       { name: "Raj M.", role: "Lead Engineer", isOwner: true },
       { name: "Chen L.", role: "Data Engineer" },
