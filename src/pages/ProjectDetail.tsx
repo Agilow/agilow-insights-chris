@@ -99,6 +99,14 @@ const projectsData: Record<string, {
       { date: "Mar 10", label: "Production Deploy", done: false },
     ],
     blockers: [],
+    upcoming: [
+      { date: "Mar 1", label: "Provision load testing environment", type: "task", owner: "Lisa N.", atRisk: true },
+      { date: "Mar 3", label: "Run full load test at 3× expected peak", type: "task", owner: "James K." },
+      { date: "Mar 5", label: "Load Testing gate decision — go/no-go for production", type: "gate-decision", owner: "Elena R." },
+      { date: "Mar 7", label: "Final security review and penetration test", type: "review", owner: "Ryan C." },
+      { date: "Mar 9", label: "Production deploy readiness review", type: "meeting", owner: "Elena R." },
+      { date: "Mar 10", label: "Production Deploy", type: "milestone", owner: "Elena R." },
+    ],
     risks: [
       {
         id: "phx-r1", description: "Load testing environment not yet provisioned", severity: "medium", source: "JIRA PHX-201",
@@ -184,6 +192,14 @@ const projectsData: Record<string, {
     blockers: [
       { date: "Feb 18", label: "Vendor auth docs outdated — 3 teams blocked", resolved: false },
     ],
+    upcoming: [
+      { date: "Mar 3", label: "Resolve vendor auth endpoint documentation gap", type: "task", owner: "Sarah W.", overdue: true },
+      { date: "Mar 5", label: "Complete remaining 6 endpoint migrations", type: "task", owner: "Tom H.", atRisk: true },
+      { date: "Mar 8", label: "API v3 migration go/no-go decision", type: "gate-decision", owner: "David P." },
+      { date: "Mar 10", label: "Update client SDK for all consumers", type: "task", owner: "Sarah W." },
+      { date: "Mar 12", label: "Integration testing with downstream teams", type: "review", owner: "David P." },
+      { date: "Mar 12", label: "Client SDK Update", type: "milestone", owner: "David P." },
+    ],
     risks: [
       {
         id: "api-r1", description: "3 teams blocked on auth endpoint — vendor docs outdated", severity: "high", source: "Slack #api-team",
@@ -253,6 +269,11 @@ const projectsData: Record<string, {
       { date: "Feb 26", label: "Documentation", done: false },
     ],
     blockers: [],
+    upcoming: [
+      { date: "Feb 26", label: "Complete storybook documentation for 8 remaining components", type: "task", owner: "Maya L." },
+      { date: "Feb 27", label: "Product lead sign-off review", type: "review", owner: "Sofia M." },
+      { date: "Feb 28", label: "Publish to internal npm registry", type: "milestone", owner: "Sofia M." },
+    ],
     risks: [],
     dataBreakdown: [
       { source: "Slack", items: 2, lastActivity: "20 min ago" },
@@ -308,6 +329,15 @@ const projectsData: Record<string, {
     blockers: [
       { date: "Feb 20", label: "SSO provider API changes scheduled — integration stalled", resolved: false },
       { date: "Feb 25", label: "New GDPR requirement flagged by Legal", resolved: false },
+    ],
+    upcoming: [
+      { date: "Mar 3", label: "Resolve GDPR compliance approach with Legal", type: "task", owner: "David P.", atRisk: true },
+      { date: "Mar 8", label: "GDPR compliance gate decision", type: "gate-decision", owner: "James K." },
+      { date: "Mar 10", label: "Complete SSO integration (pending vendor changes)", type: "task", owner: "Alex T.", overdue: true },
+      { date: "Mar 14", label: "MFA implementation and testing", type: "task", owner: "Alex T." },
+      { date: "Mar 17", label: "Compliance audit", type: "review", owner: "Legal Team" },
+      { date: "Mar 19", label: "Security penetration test", type: "review", owner: "Ryan C." },
+      { date: "Mar 20", label: "Auth system go-live decision", type: "gate-decision", owner: "James K." },
     ],
     risks: [
       {
@@ -389,6 +419,16 @@ const projectsData: Record<string, {
       { date: "Apr 5", label: "App Store Submit", done: false },
     ],
     blockers: [],
+    upcoming: [
+      { date: "Mar 5", label: "Complete APNs push notification integration", type: "task", owner: "Sam T." },
+      { date: "Mar 8", label: "iOS offline sync edge-case testing", type: "task", owner: "Priya N." },
+      { date: "Mar 10", label: "iOS Offline Sync", type: "milestone", owner: "Sam T." },
+      { date: "Mar 12", label: "Redesigned onboarding flow QA", type: "review", owner: "Lin W." },
+      { date: "Mar 18", label: "Push notification go/no-go decision", type: "gate-decision", owner: "Jade K." },
+      { date: "Mar 20", label: "Push Notifications", type: "milestone", owner: "Jade K." },
+      { date: "Apr 1", label: "App store submission prep meeting", type: "meeting", owner: "Jade K." },
+      { date: "Apr 5", label: "App Store Submit", type: "milestone", owner: "Jade K." },
+    ],
     risks: [
       {
         id: "mob-r1", description: "Accessibility audit deferred — post-launch remediation costs possible", severity: "low", source: "Email / PM",
@@ -454,6 +494,15 @@ const projectsData: Record<string, {
     ],
     blockers: [
       { date: "Feb 24", label: "Vendor SDK v4.2 memory leak — PoC blocked", resolved: false },
+    ],
+    upcoming: [
+      { date: "Mar 1", label: "Resolve vendor SDK v4.3 release or evaluate alternative", type: "task", owner: "Raj M.", overdue: true },
+      { date: "Mar 5", label: "Streaming PoC go/no-go decision", type: "gate-decision", owner: "Raj M.", atRisk: true },
+      { date: "Mar 5", label: "Complete streaming PoC with Kafka + Flink", type: "task", owner: "Chen L.", atRisk: true },
+      { date: "Mar 10", label: "Team Flink ramp-up training", type: "task", owner: "Chen L." },
+      { date: "Mar 20", label: "Migrate batch pipelines to streaming", type: "task", owner: "Fatima O." },
+      { date: "Mar 25", label: "Performance validation & SLA compliance test", type: "review", owner: "Raj M." },
+      { date: "Mar 28", label: "SLA Validation", type: "milestone", owner: "Raj M." },
     ],
     risks: [
       {
