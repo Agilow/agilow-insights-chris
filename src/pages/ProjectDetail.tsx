@@ -5,7 +5,7 @@ import {
   ArrowLeft, CheckCircle2, AlertTriangle, Clock, Hash, TicketCheck, Mail,
   Video, Users, Calendar, GitBranch, Flag, AlertCircle, Info, ExternalLink,
   Sparkles, Filter, ChevronDown, TrendingUp, TrendingDown, Minus,
-  ThumbsUp, ThumbsDown, Pencil, X, ChevronUp, Save,
+  ThumbsUp, ThumbsDown, Pencil, X, ChevronUp, Save, ShieldAlert, ShieldCheck,
 } from "lucide-react";
 import { AppSidebar, MobileMenuButton } from "@/components/AppSidebar";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
