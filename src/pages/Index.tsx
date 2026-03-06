@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import { AppSidebar, MobileMenuButton } from "@/components/AppSidebar";
 import { ChatPanel } from "@/components/ChatPanel";
+import { RiskResourcesPanel } from "@/components/dashboard/RiskResourcesPanel";
+import { PlanManagerPanel } from "@/components/dashboard/PlanManagerPanel";
 import { useNavigate } from "react-router-dom";
 
 // ─── Project Data ───────────────────────────────────────────────────────────
