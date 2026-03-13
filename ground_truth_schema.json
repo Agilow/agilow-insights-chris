@@ -1,0 +1,143 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GroundTruthSignal",
+  "version": "1.0",
+  "description": "Schema for a single human-labeled or AI-inferred signal entry. One file per signal. All entries must validate against this schema.",
+
+  "source_types": {
+    "description": "All valid values for context_window.source_type and sources.type",
+    "allowed_values": ["slack", "granola", "linear", "email", "google_drive", "github", "whatsapp", "phone"],
+    "source_ref_shapes": {
+      "slack":        { "channel": "string", "message_ts": "string" },
+      "granola":      { "meeting": "string", "line_range": [0, 0] },
+      "linear":       { "issue_id": "string" },
+      "email":        { "thread_id": "string", "message_id": "string" },
+      "google_drive": { "file_id": "string", "page": "number" },
+      "github":       { "repo": "string", "pr_or_issue_number": "number" },
+      "whatsapp":     { "chat_name": "string", "message_ts": "string" },
+      "phone":        { "call_id": "string", "timestamp_seconds": "number" }
+    }
+  },
+
+  "primary_attributes": {
+    "description": "All valid primary attribute types and the sub-attribute fields each one accepts",
+
+    "blocker": {
+      "state_table": "blockers",
+      "sub_attribute_fields": [
+        { "field": "summary",        "type": "string",  "required": true,  "reasoning_required": false, "description": "One-sentence description of what is blocked and why" },
+        { "field": "severity",       "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["critical", "high", "medium", "low"] },
+        { "field": "owner",          "type": "string",  "required": false, "reasoning_required": false, "description": "Person responsible for unblocking. Null if unknown." },
+        { "field": "status",         "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["open", "in_progress", "resolved", "wont_fix"] },
+        { "field": "blocking_since", "type": "date",    "required": false, "reasoning_required": false, "description": "YYYY-MM-DD. Date when the block began. Null if not determinable." }
+      ]
+    },
+
+    "risk": {
+      "state_table": "risks",
+      "sub_attribute_fields": [
+        { "field": "summary",         "type": "string",  "required": true,  "reasoning_required": false, "description": "One-sentence description of the risk and its potential impact" },
+        { "field": "severity",        "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["critical", "high", "medium", "low"] },
+        { "field": "likelihood",      "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["high", "medium", "low"] },
+        { "field": "status",          "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["open", "mitigated", "resolved"] },
+        { "field": "owner",           "type": "string",  "required": false, "reasoning_required": false, "description": "Person responsible for monitoring or mitigating this risk" },
+        { "field": "mitigation_plan", "type": "string",  "required": false, "reasoning_required": false, "description": "What the team plans to do to reduce the risk. Null if none stated." }
+      ]
+    },
+
+    "decision": {
+      "state_table": "decisions",
+      "sub_attribute_fields": [
+        { "field": "summary",  "type": "string",  "required": true,  "reasoning_required": false, "description": "One-sentence statement of what was decided" },
+        { "field": "made_by",  "type": "string",  "required": false, "reasoning_required": false, "description": "Person or team who made the decision" },
+        { "field": "made_at",  "type": "date",    "required": false, "reasoning_required": false, "description": "YYYY-MM-DD. Date the decision was made." },
+        { "field": "impact",   "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["high", "medium", "low"] },
+        { "field": "rationale","type": "string",  "required": false, "reasoning_required": false, "description": "Why this decision was made. Direct quote or paraphrase from source." }
+      ]
+    },
+
+    "task": {
+      "state_table": "tasks",
+      "sub_attribute_fields": [
+        { "field": "summary",  "type": "string",  "required": true,  "reasoning_required": false, "description": "One-sentence description of what needs to be done" },
+        { "field": "owner",    "type": "string",  "required": false, "reasoning_required": false, "description": "Person assigned to this task" },
+        { "field": "due_date", "type": "date",    "required": false, "reasoning_required": false, "description": "YYYY-MM-DD. When this task is due." },
+        { "field": "status",   "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["todo", "in_progress", "done", "slipped"] },
+        { "field": "priority", "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["high", "medium", "low"] }
+      ]
+    },
+
+    "milestone": {
+      "state_table": "milestones",
+      "sub_attribute_fields": [
+        { "field": "name",             "type": "string",  "required": true,  "reasoning_required": false, "description": "Name or label of the milestone" },
+        { "field": "status",           "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["upcoming", "in_progress", "complete", "missed"] },
+        { "field": "due_date",         "type": "date",    "required": false, "reasoning_required": false, "description": "YYYY-MM-DD. Target completion date." },
+        { "field": "completion_date",  "type": "date",    "required": false, "reasoning_required": false, "description": "YYYY-MM-DD. Actual date completed. Null if not yet complete." }
+      ]
+    },
+
+    "lessons_learned": {
+      "state_table": "lessons_learned",
+      "note": "Scalar — no sub_attribute_updates. Use top-level value and value_reasoning fields instead.",
+      "sub_attribute_fields": []
+    }
+  },
+
+  "signal_skeleton": {
+    "description": "Copy this skeleton to create a new ground truth entry. Replace all FILL_IN placeholders.",
+
+    "id": "gt-FILL_IN",
+
+    "context_window": {
+      "source_type": "FILL_IN",
+      "source_ref": {},
+      "raw_content": "FILL_IN — paste 8-10 lines of surrounding context here"
+    },
+
+    "signal": {
+      "raw_content": "FILL_IN — paste the specific 1-3 line excerpt containing the signal",
+      "confidence": "FILL_IN — high | medium | low",
+      "labeled_by": "FILL_IN — your name or ai",
+      "labeled_at": "FILL_IN — ISO 8601 datetime e.g. 2026-03-13T10:00:00Z",
+      "ambiguity_flags": []
+    },
+
+    "attribute_updates": [
+      {
+        "project": "FILL_IN — project id",
+        "project_reasoning": "FILL_IN — why this project and not another",
+
+        "primary_attribute": "FILL_IN — blocker | risk | decision | task | milestone | lessons_learned",
+        "primary_attribute_action": "FILL_IN — create | update",
+        "primary_attribute_reasoning": "FILL_IN — why this attribute type and not another",
+        "existing_attribute_ref": null,
+
+        "sub_attribute_updates": [
+          {
+            "field": "FILL_IN — column name from DATABASE_TABLES.md",
+            "value": "FILL_IN",
+            "reasoning": "FILL_IN — required for judgment-call fields; null for explicit facts"
+          }
+        ],
+
+        "_lessons_learned_note": "If primary_attribute is lessons_learned, remove sub_attribute_updates and use these instead:",
+        "value": null,
+        "value_reasoning": null
+      }
+    ]
+  },
+
+  "confidence_guide": {
+    "high":   "Clear-cut. Another labeler would make the same call.",
+    "medium": "Some ambiguity. Could plausibly be classified differently.",
+    "low":    "Educated guess. Genuinely uncertain — flag in ambiguity_flags."
+  },
+
+  "reasoning_rules": {
+    "description": "When is reasoning required vs optional?",
+    "always_required": ["project_reasoning", "primary_attribute_reasoning"],
+    "required_for_judgment_calls": ["severity", "likelihood", "impact", "priority", "status"],
+    "never_required": ["explicit names", "verbatim dates", "direct quotes", "boolean values"]
+  }
+}
