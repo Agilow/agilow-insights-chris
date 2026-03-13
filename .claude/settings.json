@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git pull)",
+      "Bash(wc -l /Users/shivpanjwani/Documents/GitHub/agilow-insights-chris/src/pages/*.tsx)",
+      "Bash(wc -l /Users/shivpanjwani/Documents/GitHub/agilow-insights-chris/src/components/*.tsx)"
+    ]
+  }
+}
