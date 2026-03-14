@@ -1,0 +1,84 @@
+{
+  "id": "gt-001",
+
+  "context_window": {
+    "source_type": "granola",
+    "source_ref": {
+      "meeting": "Agilow Offsite (Q1 review; Q2 Planning)",
+      "date": "2026-03-14",
+      "line_range": [7, 10],
+      "participants": ["Precious", "Antonio", "Cameron", "Shaurya"]
+    },
+    "raw_content": "Me: Yeah. The most important documents we discuss were the schema update guide. And remake a new products. This is old. This is the old products. And now I'm about to commit database tables. MD. This one. Schema, update guide, database tables. I'm linked. So once I come up, these are the two. You should read this. Product spec is old. I should rename it. Okay? Next. Coming back here. So if I didn't miss anything else. Pressure anything. I mean, I know I've not written anything about LinkedIn or blogs. But I did that intentionally. Because I wasn't sure. Between the lead research. And the application research, you're going to be able to also make progress on the blog."
+  },
+
+  "signal": {
+    "raw_content": "these are the two. You should read this.",
+    "confidence": "high",
+    "labeled_by": "shiv",
+    "labeled_at": "2026-03-14T00:00:00Z",
+    "ambiguity_flags": [
+      "Signal is short — 'the two' and 'this' refer to DATABASE_TABLES.md and SCHEMA_UPDATE_GUIDE.md from prior sentences in context window",
+      "Owner inferred from meeting context — 'Me' is speaking TO Shaurya, not explicitly naming him"
+    ]
+  },
+
+  "attribute_updates": [
+    {
+      "project": "agilow-pilot-product",
+      "project_reasoning": "Speaker is discussing DATABASE_TABLES.md and SCHEMA_UPDATE_GUIDE.md — from the transcript, these are schema and database documents. From external project context (not in transcript): these files exist in the agilow-insights-chris repo (source: codebase), which is the Agilow platform product build. The schema work defines the data model for the Agilow intelligence layer.",
+
+      "primary_attribute": "task",
+      "primary_attribute_action": "create",
+      "primary_attribute_reasoning": "'You should read this' is a directive — assigning a read/review action to a team member. No risk, blocker, or decision language present.",
+
+      "sub_attribute_updates": [
+        { "field": "summary", "value": "Read DATABASE_TABLES.md and SCHEMA_UPDATE_GUIDE.md" },
+        {
+          "field": "owner",
+          "value": "shaurya",
+          "reasoning": "Speaker ('Me' = Shiv) directs 'you should read this' — Shaurya is the addressed participant based on meeting context. From external team context (not in transcript): Shaurya's role is engineer on the Agilow platform (source: team knowledge)."
+        },
+        { "field": "due_date", "value": null },
+        {
+          "field": "status",
+          "value": "todo",
+          "reasoning": "Just assigned verbally in this meeting — no prior mention or progress"
+        },
+        {
+          "field": "priority",
+          "value": "low",
+          "reasoning": "No urgency language, no deadline stated, no dependency mentioned — just 'you should read this'"
+        }
+      ]
+    },
+    {
+      "project": "chris-demo",
+      "project_reasoning": "Speaker discusses database tables and schema documents. From external project context (not in transcript): DATABASE_TABLES.md defines the schema for a demo presentation to Chris scheduled for March 15, 2026 (source: PRODUCT_SPEC.md). The schema update guide supports implementing that schema for the demo build.",
+
+      "primary_attribute": "task",
+      "primary_attribute_action": "create",
+      "primary_attribute_reasoning": "'You should read this' is a directive — assigning a read/review action to a team member. No risk, blocker, or decision language present.",
+
+      "sub_attribute_updates": [
+        { "field": "summary", "value": "Read DATABASE_TABLES.md and SCHEMA_UPDATE_GUIDE.md" },
+        {
+          "field": "owner",
+          "value": "shaurya",
+          "reasoning": "Speaker ('Me' = Shiv) directs 'you should read this' — Shaurya is the addressed participant based on meeting context. From external team context (not in transcript): Shaurya's role is engineer on the demo build (source: team knowledge)."
+        },
+        { "field": "due_date", "value": null },
+        {
+          "field": "status",
+          "value": "todo",
+          "reasoning": "Just assigned verbally in this meeting — no prior mention or progress"
+        },
+        {
+          "field": "priority",
+          "value": "medium",
+          "reasoning": "No urgency language in the signal itself. However, from external project context (not in transcript): Chris demo is scheduled for March 15, 2026 (source: PRODUCT_SPEC.md), one day after this meeting — reading the schema docs is time-sensitive for the demo build. Priority elevated from low to medium based on this external deadline."
+        }
+      ]
+    }
+  ]
+}
