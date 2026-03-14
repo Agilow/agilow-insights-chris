@@ -1,0 +1,58 @@
+{
+  "id": "gt-FILL_IN",
+
+  "context_window": {
+    "source_type": "granola",
+    "source_ref": {
+      "meeting": "FILL_IN — e.g. Agilow Power Hour — 2026-03-10",
+      "date": "FILL_IN — YYYY-MM-DD",
+      "line_range": [0, 0],
+      "participants": ["FILL_IN — list everyone in the meeting besides the speaker"]
+    },
+    "raw_content": "FILL_IN — paste 8-10 lines of surrounding context from the transcript"
+  },
+
+  "signal": {
+    "raw_content": "FILL_IN — paste the specific 1-3 line excerpt containing the signal. Must be a substring of context_window.raw_content.",
+    "confidence": "FILL_IN — high | medium | low",
+    "labeled_by": "FILL_IN — your name (lowercase)",
+    "labeled_at": "FILL_IN — ISO 8601 e.g. 2026-03-14T10:00:00Z",
+    "ambiguity_flags": [
+      "FILL_IN — note any pronoun references, implicit owners, or context needed to interpret the signal. Delete this array entry if none."
+    ]
+  },
+
+  "attribute_updates": [
+    {
+      "project": "FILL_IN — project id (lowercase, hyphenated)",
+      "project_reasoning": "FILL_IN — why this project and not another. If using external knowledge, flag it: 'From external [type] context (not in transcript): [fact] (source: [source]).'",
+
+      "primary_attribute": "FILL_IN — blocker | risk | decision | task | milestone | lessons_learned",
+      "primary_attribute_action": "FILL_IN — create | update",
+      "primary_attribute_reasoning": "FILL_IN — why this attribute type and not another. Cite specific language from the signal.",
+      "existing_attribute_ref": null,
+
+      "sub_attribute_updates": [
+        { "field": "summary", "value": "FILL_IN — one-sentence description" },
+        {
+          "field": "owner",
+          "value": "FILL_IN or null",
+          "reasoning": "FILL_IN — how was owner identified? (explicit name, speaker/listener inference, role mapping). Flag external knowledge if used."
+        },
+        { "field": "due_date", "value": null },
+        {
+          "field": "status",
+          "value": "FILL_IN — see ground_truth_schema.json for allowed values per attribute type",
+          "reasoning": "FILL_IN — why this status?"
+        },
+        {
+          "field": "priority",
+          "value": "FILL_IN — high | medium | low (tasks only)",
+          "reasoning": "FILL_IN — why this priority level? Flag external knowledge if used."
+        }
+      ],
+
+      "_note": "Sub-attribute fields vary by primary_attribute type. See ground_truth_schema.json for the exact fields. The example above is for a task. For blocker use: summary, severity, owner, status, blocking_since. For risk use: summary, severity, likelihood, status, owner, mitigation_plan. For decision use: summary, made_by, made_at, impact, rationale. For milestone use: name, status, due_date, completion_date. For lessons_learned: remove sub_attribute_updates and use top-level value + value_reasoning instead."
+    }
+  ]
+}

@@ -11,7 +11,9 @@
       "Bash(git log:*)",
       "Bash(git checkout:*)",
       "Bash(git branch:*)",
-      "Bash(gh:*)"
+      "Bash(gh:*)",
+      "Bash(git push origin main)",
+      "Bash(git status -u)"
     ],
     "additionalDirectories": [
       "/Users/shivpanjwani/Documents/GitHub/agilow-insights-chris/ground_truth"
