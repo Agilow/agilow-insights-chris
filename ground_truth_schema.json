@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "GroundTruthSignal",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Schema for a single human-labeled or AI-inferred signal entry. One file per signal. All entries must validate against this schema.",
 
   "source_types": {
@@ -27,7 +27,7 @@
       "sub_attribute_fields": [
         { "field": "summary",        "type": "string",  "required": true,  "reasoning_required": false, "description": "One-sentence description of what is blocked and why" },
         { "field": "severity",       "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["critical", "high", "medium", "low"] },
-        { "field": "owner",          "type": "string",  "required": false, "reasoning_required": false, "description": "Person responsible for unblocking. Null if unknown." },
+        { "field": "owner",          "type": "string",  "required": false, "reasoning_required": true,  "description": "Person responsible for unblocking. Null if unknown. Reasoning must explain how owner was identified (explicit name, speaker/listener inference, role mapping)." },
         { "field": "status",         "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["open", "in_progress", "resolved", "wont_fix"] },
         { "field": "blocking_since", "type": "date",    "required": false, "reasoning_required": false, "description": "YYYY-MM-DD. Date when the block began. Null if not determinable." }
       ]
@@ -40,7 +40,7 @@
         { "field": "severity",        "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["critical", "high", "medium", "low"] },
         { "field": "likelihood",      "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["high", "medium", "low"] },
         { "field": "status",          "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["open", "mitigated", "resolved"] },
-        { "field": "owner",           "type": "string",  "required": false, "reasoning_required": false, "description": "Person responsible for monitoring or mitigating this risk" },
+        { "field": "owner",           "type": "string",  "required": false, "reasoning_required": true,  "description": "Person responsible for monitoring or mitigating this risk. Reasoning must explain how owner was identified (explicit name, speaker/listener inference, role mapping)." },
         { "field": "mitigation_plan", "type": "string",  "required": false, "reasoning_required": false, "description": "What the team plans to do to reduce the risk. Null if none stated." }
       ]
     },
@@ -60,7 +60,7 @@
       "state_table": "tasks",
       "sub_attribute_fields": [
         { "field": "summary",  "type": "string",  "required": true,  "reasoning_required": false, "description": "One-sentence description of what needs to be done" },
-        { "field": "owner",    "type": "string",  "required": false, "reasoning_required": false, "description": "Person assigned to this task" },
+        { "field": "owner",    "type": "string",  "required": false, "reasoning_required": true,  "description": "Person assigned to this task. Reasoning must explain how owner was identified (explicit name, speaker/listener inference, role mapping)." },
         { "field": "due_date", "type": "date",    "required": false, "reasoning_required": false, "description": "YYYY-MM-DD. When this task is due." },
         { "field": "status",   "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["todo", "in_progress", "done", "slipped"] },
         { "field": "priority", "type": "enum",    "required": true,  "reasoning_required": true,  "allowed_values": ["high", "medium", "low"] }
@@ -137,7 +137,7 @@
   "reasoning_rules": {
     "description": "When is reasoning required vs optional?",
     "always_required": ["project_reasoning", "primary_attribute_reasoning"],
-    "required_for_judgment_calls": ["severity", "likelihood", "impact", "priority", "status"],
+    "required_for_judgment_calls": ["severity", "likelihood", "impact", "priority", "status", "owner"],
     "never_required": ["explicit names", "verbatim dates", "direct quotes", "boolean values"]
   }
 }

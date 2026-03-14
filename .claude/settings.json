@@ -1,9 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git pull)",
-      "Bash(wc -l /Users/shivpanjwani/Documents/GitHub/agilow-insights-chris/src/pages/*.tsx)",
-      "Bash(wc -l /Users/shivpanjwani/Documents/GitHub/agilow-insights-chris/src/components/*.tsx)"
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(npx prisma:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git checkout:*)",
+      "Bash(git branch:*)",
+      "Bash(gh:*)"
+    ],
+    "additionalDirectories": [
+      "/Users/shivpanjwani/Documents/GitHub/agilow-insights-chris/ground_truth"
     ]
   }
 }
