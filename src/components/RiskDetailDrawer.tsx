@@ -59,6 +59,7 @@ interface Props {
 }
 
 export function RiskDetailDrawer({ risk, onClose }: Props) {
+  const navigate = useNavigate();
   const [newNote, setNewNote] = useState("");
   const [notes, setNotes] = useState(risk.notes || []);
   const st = statusConfig[risk.status];
