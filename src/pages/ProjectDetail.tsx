@@ -209,9 +209,9 @@ const projectsData: Record<string, {
         affectedMilestones: ["Endpoint Migration", "Client SDK Update"],
         flaggedReason: "Negative sentiment detected across 5 Slack messages over 3 days. Three separate teams have reported being blocked. Jira blocker ticket remains unresolved for 10 days.",
         signals: [
-          { source: "Slack", summary: "Team Alpha, Team Beta, and Team Gamma all reported auth endpoint failures in #api-team", date: "Feb 22–25" },
-          { source: "Jira", summary: "API-410 'Auth endpoint migration' blocked — vendor docs reference deprecated API", date: "Feb 20" },
-          { source: "Email", summary: "David escalated to vendor support with no response after 5 business days", date: "Feb 23" },
+          { source: "Slack", summary: "Team Alpha, Team Beta, and Team Gamma all reported auth endpoint failures in #api-team", date: "Feb 22–25", quote: "We've been getting 401s on the /auth/token endpoint since Tuesday. Same issue as Team Beta reported. The vendor docs don't match what the API actually returns.", signalId: "sig-004" },
+          { source: "Jira", summary: "API-410 'Auth endpoint migration' blocked — vendor docs reference deprecated API", date: "Feb 20", quote: "Blocked — vendor documentation references v2 endpoints that return 404. Can't proceed with migration until updated docs are available.", signalId: "sig-005" },
+          { source: "Email", summary: "David escalated to vendor support with no response after 5 business days", date: "Feb 23", quote: "Following up on my Feb 18 email regarding the auth endpoint documentation discrepancies. Three of our teams are now blocked. Please advise on timeline for updated docs.", signalId: "sig-006" },
         ],
         sourceLinks: [
           { label: "JIRA API-410 — Auth endpoint blocked", type: "jira", url: "#" },
