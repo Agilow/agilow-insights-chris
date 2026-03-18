@@ -1,0 +1,68 @@
+{
+  "id": "gt-004",
+
+  "context_window": {
+    "source_type": "granola",
+    "source_ref": {
+      "meeting": "Agilow Offsite (Q1 review; Q2 Planning)",
+      "date": "2026-03-14",
+      "line_range": [11, 30],
+      "participants": ["Precious", "Antonio", "Cameron", "Shaurya"]
+    },
+    "raw_content": "Me: I know I've not written anything about LinkedIn or blogs. But I did that intentionally. Because I wasn't sure. Between the lead research. And the application research, you're going to be able to also make progress on the blog. Them: I can actually combine all because now that we are currently. You already have an ED product and all that LinkedIn is very important for us right now. We have to prioritize it. Me: I much rather prefer blogs. Them: Okay? Me: Because. We can add blocks to our website. And so when someone comes to a website, gives access, credibility, like the same thing we have on a website in one blog. Also, if we start a newsletter, like a substack newsletter, where we write a blog. For next month's email update. Instead of writing this long email, we can just put a sub stack link. And we can add some pictures to us participating and some other pictures as well. So that's why I prefer to start. And also, I think fundamentally, we like. We are an academic company. We like putting information out there. And I think on LinkedIn it just gets lost in the noise. And I would rather us write like long format articles. On project management, Agilent, AI and Agile. Other applications of what we've learned around carn, email and design thinking. These kind of. Knowledge topics that we have. Share those using blogs and newsletters. And then, yeah, if we do a good job of that, you could Maybe take some LinkedIn snippets from there and make summaries of those and put on LinkedIn. But I would Rajada start creating a blog habit in a company where we are writing professional topics. And sharing them. Them: No problem. Me: So that is, if you want in your sprint goals, you can add it. It'll be a bonus. It'd be a great bonus. But this is what I have come up with now. Okay, so now let's go ahead and do that. Let's create a sprint goal."
+  },
+
+  "signal": {
+    "raw_content": "I know I've not written anything about LinkedIn or blogs. But I did that intentionally. Because I wasn't sure. Between the lead research. And the application research, you're going to be able to also make progress on the blog.",
+    "confidence": "high",
+    "labeled_by": "ai",
+    "labeled_at": "2026-03-18T00:00:00Z",
+    "ambiguity_flags": [
+      "'Me' is Shiv (source: gt-001 established 'Me' = Shiv). 'Them' identity is not explicitly stated — from external context (not in transcript): likely the team member responsible for lead research and application research, but cannot be confirmed from transcript alone",
+      "Shiv explicitly acknowledges uncertainty ('I wasn't sure') about this person's capacity to take on content work alongside their existing research responsibilities — this is not inferred, it is stated directly",
+      "The blog work is then relegated to 'bonus' status later in the same conversation ('if you want in your sprint goals, you can add it. It'll be a bonus'), meaning it has no committed sprint allocation"
+    ]
+  },
+
+  "attribute_updates": [
+    {
+      "project": "agilow-marketing",
+      "project_reasoning": "The signal concerns the team's capacity to execute on content and visibility work (blogs, newsletters). From external project context (not in transcript): marketing and outreach activities — including content strategy — are tracked under the agilow-marketing project scope (source: team knowledge). A bandwidth risk on content execution belongs here.",
+
+      "primary_attribute": "risk",
+      "primary_attribute_action": "create",
+      "primary_attribute_reasoning": "Shiv states he intentionally excluded content work (blogs/LinkedIn) from the sprint plan because he 'wasn't sure' the team member could handle it alongside lead research and application research. Despite a subsequent conversation where blogs are chosen as the preferred channel, the work is only added as an optional 'bonus' — not a committed goal. This means the team's content strategy has no guaranteed capacity allocated to it. This is a resource/bandwidth risk: a recognized need (content for visibility and credibility) may go unaddressed because the person best positioned to do it is already at capacity with research work.",
+
+      "sub_attribute_updates": [
+        {
+          "field": "summary",
+          "value": "Content strategy (blogs/newsletter) has no committed sprint capacity — added only as optional 'bonus' because team member may not have bandwidth alongside lead and application research"
+        },
+        {
+          "field": "severity",
+          "value": "low",
+          "reasoning": "Content and visibility work is important for medium-term growth but is not blocking any immediate deliverable (demo, product launch, or accelerator application). The team can operate without blog content in the short term. However, the longer this goes unaddressed, the harder it becomes to build the 'blog habit' Shiv wants."
+        },
+        {
+          "field": "likelihood",
+          "value": "high",
+          "reasoning": "Shiv himself expressed doubt about bandwidth before the conversation even started ('I wasn't sure'). The work was then placed as a 'bonus' rather than a committed sprint goal. Optional items with no dedicated owner or deadline are very likely to be deprioritized when competing with research deliverables that are committed."
+        },
+        {
+          "field": "status",
+          "value": "open",
+          "reasoning": "The sprint plan is being created in this meeting. Content work is positioned as optional. No blog has been started and no capacity has been formally allocated — the risk is active from the moment the sprint begins."
+        },
+        {
+          "field": "owner",
+          "value": "shiv",
+          "reasoning": "Shiv is the one who chose to exclude content from the committed sprint plan and relegate it to 'bonus' status. As the sprint planner and decision-maker, the risk of content work not getting done sits with him."
+        },
+        {
+          "field": "mitigation_plan",
+          "value": "Team member offered to 'combine all' (research and content) into one workflow, which could reduce incremental effort. Shiv also suggested a blog-to-LinkedIn repurposing pipeline that could make content creation more efficient once the first blog is published."
+        }
+      ]
+    }
+  ]
+}
