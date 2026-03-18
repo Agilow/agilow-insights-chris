@@ -187,6 +187,21 @@ const rejectionReasons = [
   "Low relevance",
 ];
 
+/* ── Available projects for dropdown ── */
+const projectOptions = [
+  { id: "auth-overhaul", name: "Auth Overhaul" },
+  { id: "api-migration-v3", name: "API Migration v3" },
+  { id: "project-phoenix", name: "Project Phoenix" },
+  { id: "regulatory-compliance", name: "Regulatory Compliance" },
+  { id: "data-pipeline-2", name: "Data Pipeline v2" },
+  { id: "mobile-app-redesign", name: "Mobile App Redesign" },
+];
+
+const ownerOptions = [
+  "Marcus Chen", "Elena R.", "James K.", "Ryan C.", "Alex T.",
+  "David M.", "Sofia M.", "Lisa P.", "Sarah L.", "John D.",
+];
+
 /* ── Component ── */
 export default function Signals() {
   const [signals, setSignals] = useState<Signal[]>(mockSignals);
@@ -195,6 +210,18 @@ export default function Signals() {
   const [filterStatus, setFilterStatus] = useState<string>("pending");
   const [filterSource, setFilterSource] = useState<string>("all");
   const [rejectingId, setRejectingId] = useState<string | null>(null);
+  // Track inline edits per signal
+  const [edits, setEdits] = useState<Record<string, Partial<Signal>>>({});
+
+  const getEdited = (signal: Signal): Signal => {
+    const e = edits[signal.id];
+    if (!e) return signal;
+    return { ...signal, ...e, project: e.project ?? signal.project };
+  };
+
+  const updateEdit = (id: string, patch: Partial<Signal>) => {
+    setEdits((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }));
+  };
 
   const filteredSignals = signals.filter((s) => {
     if (filterType !== "all" && s.signalType !== filterType) return false;
@@ -208,12 +235,18 @@ export default function Signals() {
   const rejectedCount = signals.filter((s) => s.status === "rejected").length;
 
   const handleValidate = (id: string) => {
-    setSignals((prev) => prev.map((s) => s.id === id ? { ...s, status: "validated" as const } : s));
+    const edited = edits[id];
+    setSignals((prev) => prev.map((s) => {
+      if (s.id !== id) return s;
+      return { ...s, ...(edited || {}), status: "validated" as const };
+    }));
+    setEdits((prev) => { const next = { ...prev }; delete next[id]; return next; });
     setRejectingId(null);
   };
 
   const handleReject = (id: string, reason: string) => {
     setSignals((prev) => prev.map((s) => s.id === id ? { ...s, status: "rejected" as const, rejectionReason: reason } : s));
+    setEdits((prev) => { const next = { ...prev }; delete next[id]; return next; });
     setRejectingId(null);
   };
 
@@ -237,7 +270,7 @@ export default function Signals() {
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                Review and validate signals extracted from your workspace sources. Confirm what's accurate, reject what's not.
+                Review, edit, and validate signals extracted from your workspace sources. Adjust any field before confirming.
               </p>
             </div>
           </div>
@@ -281,7 +314,6 @@ export default function Signals() {
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <Filter className="w-3.5 h-3.5" /> Filter:
             </div>
-            {/* Type filter */}
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
@@ -292,7 +324,6 @@ export default function Signals() {
                 <option key={key} value={key}>{cfg.label}</option>
               ))}
             </select>
-            {/* Source filter */}
             <select
               value={filterSource}
               onChange={(e) => setFilterSource(e.target.value)}
@@ -327,11 +358,13 @@ export default function Signals() {
                 </motion.div>
               )}
               {filteredSignals.map((signal) => {
-                const typeCfg = signalTypeConfig[signal.signalType];
+                const edited = getEdited(signal);
+                const typeCfg = signalTypeConfig[edited.signalType];
                 const srcCfg = sourceConfig[signal.source.type];
                 const isExpanded = expandedId === signal.id;
                 const TypeIcon = typeCfg?.icon || AlertTriangle;
                 const SrcIcon = srcCfg?.icon || MessageSquare;
+                const hasEdits = !!edits[signal.id] && Object.keys(edits[signal.id]).length > 0;
 
                 return (
                   <motion.div
@@ -345,6 +378,7 @@ export default function Signals() {
                       "rounded-xl border bg-card overflow-hidden transition-all",
                       signal.status === "validated" && "border-status-success/30 bg-status-success/[0.02]",
                       signal.status === "rejected" && "border-border opacity-60",
+                      hasEdits && signal.status === "pending" && "border-[hsl(var(--accent))]/40 ring-1 ring-[hsl(var(--accent))]/10",
                     )}
                   >
                     {/* Main row */}
@@ -352,27 +386,22 @@ export default function Signals() {
                       onClick={() => setExpandedId(isExpanded ? null : signal.id)}
                       className="w-full text-left px-4 py-3.5 flex items-start gap-3"
                     >
-                      {/* Type icon */}
                       <div className={cn("shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5", typeCfg?.color)}>
                         <TypeIcon className="w-4 h-4" />
                       </div>
-
-                      {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
                           <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 rounded", typeCfg?.color)}>
                             {typeCfg?.label}
                           </span>
-                          <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded border", severityColors[signal.severity])}>
-                            {signal.severity}
+                          <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded border", severityColors[edited.severity])}>
+                            {edited.severity}
                           </span>
                           <span className={cn("text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1", srcCfg?.color)}>
                             <SrcIcon className="w-2.5 h-2.5" /> {srcCfg?.label}
                           </span>
-                          {signal.confidence !== "high" && (
-                            <span className="text-[10px] text-muted-foreground italic">
-                              {signal.confidence} confidence
-                            </span>
+                          {hasEdits && signal.status === "pending" && (
+                            <span className="text-[10px] text-[hsl(var(--accent))] font-medium">• edited</span>
                           )}
                         </div>
                         <p className="text-sm text-foreground leading-snug line-clamp-2 italic">
@@ -380,16 +409,16 @@ export default function Signals() {
                         </p>
                         <div className="flex items-center gap-3 mt-1.5 text-[11px] text-muted-foreground">
                           <span className="flex items-center gap-1">
-                            <ArrowRight className="w-3 h-3" /> {signal.project.name}
+                            <ArrowRight className="w-3 h-3" /> {edited.project.name}
                           </span>
-                          {signal.owner && (
+                          {edited.owner && (
                             <span className="flex items-center gap-1">
-                              <User className="w-3 h-3" /> {signal.owner}
+                              <User className="w-3 h-3" /> {edited.owner}
                             </span>
                           )}
-                          {signal.dueDate && (
+                          {edited.dueDate && (
                             <span className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" /> {signal.dueDate}
+                              <Clock className="w-3 h-3" /> {edited.dueDate}
                             </span>
                           )}
                           <span>{signal.detectedAt}</span>
@@ -465,7 +494,7 @@ export default function Signals() {
                       )}
                     </AnimatePresence>
 
-                    {/* Expanded detail */}
+                    {/* Expanded detail — EDITABLE */}
                     <AnimatePresence>
                       {isExpanded && (
                         <motion.div
@@ -475,7 +504,7 @@ export default function Signals() {
                           className="overflow-hidden border-t border-border"
                         >
                           <div className="px-4 py-4 space-y-4 bg-muted/30">
-                            {/* Source & Context */}
+                            {/* Source & Context (read-only) */}
                             <div>
                               <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Source & Context</h4>
                               <div className="rounded-lg border border-border bg-card p-3">
@@ -497,66 +526,123 @@ export default function Signals() {
                               </div>
                             </div>
 
-                            {/* AI Analysis */}
+                            {/* Editable fields */}
                             <div>
-                              <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">AI Analysis</h4>
+                              <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+                                Signal Details {signal.status === "pending" && <span className="text-[hsl(var(--accent))] normal-case font-normal ml-1">— click to edit</span>}
+                              </h4>
                               <div className="grid grid-cols-2 gap-3">
+                                {/* Type */}
                                 <div className="rounded-lg border border-border bg-card p-3">
-                                  <div className="text-[10px] text-muted-foreground mb-1">Detected Type</div>
-                                  <div className="flex items-center gap-1.5">
-                                    <span className={cn("text-xs font-medium px-2 py-0.5 rounded flex items-center gap-1", typeCfg?.color)}>
+                                  <div className="text-[10px] text-muted-foreground mb-1.5">Type</div>
+                                  {signal.status === "pending" ? (
+                                    <select
+                                      value={edited.signalType}
+                                      onChange={(e) => updateEdit(signal.id, { signalType: e.target.value })}
+                                      className="w-full text-xs rounded-md border border-border bg-background px-2 py-1.5 text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                                    >
+                                      {Object.entries(signalTypeConfig).map(([key, cfg]) => (
+                                        <option key={key} value={key}>{cfg.label}</option>
+                                      ))}
+                                    </select>
+                                  ) : (
+                                    <span className={cn("text-xs font-medium px-2 py-0.5 rounded flex items-center gap-1 w-fit", typeCfg?.color)}>
                                       <TypeIcon className="w-3 h-3" /> {typeCfg?.label}
                                     </span>
-                                  </div>
+                                  )}
                                 </div>
+
+                                {/* Severity */}
                                 <div className="rounded-lg border border-border bg-card p-3">
-                                  <div className="text-[10px] text-muted-foreground mb-1">Severity / Priority</div>
-                                  <span className={cn("text-xs font-medium px-2 py-0.5 rounded border", severityColors[signal.severity])}>
-                                    {signal.severity}
-                                  </span>
+                                  <div className="text-[10px] text-muted-foreground mb-1.5">Severity</div>
+                                  {signal.status === "pending" ? (
+                                    <select
+                                      value={edited.severity}
+                                      onChange={(e) => updateEdit(signal.id, { severity: e.target.value as Signal["severity"] })}
+                                      className="w-full text-xs rounded-md border border-border bg-background px-2 py-1.5 text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                                    >
+                                      <option value="critical">Critical</option>
+                                      <option value="high">High</option>
+                                      <option value="medium">Medium</option>
+                                      <option value="low">Low</option>
+                                    </select>
+                                  ) : (
+                                    <span className={cn("text-xs font-medium px-2 py-0.5 rounded border", severityColors[edited.severity])}>
+                                      {edited.severity}
+                                    </span>
+                                  )}
                                 </div>
+
+                                {/* Project */}
                                 <div className="rounded-lg border border-border bg-card p-3">
-                                  <div className="text-[10px] text-muted-foreground mb-1">Assigned Project</div>
-                                  <span className="text-xs font-medium text-foreground">{signal.project.name}</span>
+                                  <div className="text-[10px] text-muted-foreground mb-1.5">Project</div>
+                                  {signal.status === "pending" ? (
+                                    <select
+                                      value={edited.project.id}
+                                      onChange={(e) => {
+                                        const proj = projectOptions.find((p) => p.id === e.target.value);
+                                        if (proj) updateEdit(signal.id, { project: proj });
+                                      }}
+                                      className="w-full text-xs rounded-md border border-border bg-background px-2 py-1.5 text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                                    >
+                                      {projectOptions.map((p) => (
+                                        <option key={p.id} value={p.id}>{p.name}</option>
+                                      ))}
+                                    </select>
+                                  ) : (
+                                    <span className="text-xs font-medium text-foreground">{edited.project.name}</span>
+                                  )}
                                 </div>
+
+                                {/* Owner */}
                                 <div className="rounded-lg border border-border bg-card p-3">
-                                  <div className="text-[10px] text-muted-foreground mb-1">Confidence</div>
-                                  <span className={cn(
-                                    "text-xs font-medium px-2 py-0.5 rounded",
-                                    signal.confidence === "high" ? "bg-status-success/10 text-status-success" :
-                                    signal.confidence === "medium" ? "bg-status-warning/10 text-status-warning" :
-                                    "bg-status-danger/10 text-status-danger"
-                                  )}>
-                                    {signal.confidence}
-                                  </span>
+                                  <div className="text-[10px] text-muted-foreground mb-1.5">Owner</div>
+                                  {signal.status === "pending" ? (
+                                    <select
+                                      value={edited.owner || ""}
+                                      onChange={(e) => updateEdit(signal.id, { owner: e.target.value || null })}
+                                      className="w-full text-xs rounded-md border border-border bg-background px-2 py-1.5 text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                                    >
+                                      <option value="">Unassigned</option>
+                                      {ownerOptions.map((o) => (
+                                        <option key={o} value={o}>{o}</option>
+                                      ))}
+                                    </select>
+                                  ) : (
+                                    <div className="flex items-center gap-1.5 text-xs text-foreground font-medium">
+                                      <User className="w-3 h-3" /> {edited.owner || "Unassigned"}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </div>
 
-                            {/* Owner & Due Date */}
-                            <div className="flex gap-3">
-                              {signal.owner && (
-                                <div className="flex-1 rounded-lg border border-border bg-card p-3">
-                                  <div className="text-[10px] text-muted-foreground mb-1">Owner</div>
-                                  <div className="flex items-center gap-1.5 text-xs text-foreground font-medium">
-                                    <User className="w-3 h-3" /> {signal.owner}
-                                  </div>
-                                </div>
-                              )}
-                              {signal.dueDate && (
-                                <div className="flex-1 rounded-lg border border-border bg-card p-3">
-                                  <div className="text-[10px] text-muted-foreground mb-1">Due Date</div>
-                                  <div className="flex items-center gap-1.5 text-xs text-foreground font-medium">
-                                    <Clock className="w-3 h-3" /> {signal.dueDate}
-                                  </div>
-                                </div>
+                            {/* Recommended Action — editable */}
+                            <div className="rounded-lg border border-[hsl(var(--accent))]/20 bg-[hsl(var(--accent))]/5 p-3">
+                              <div className="text-[10px] font-semibold text-[hsl(var(--accent))] uppercase tracking-wider mb-1.5">Recommended Action</div>
+                              {signal.status === "pending" ? (
+                                <textarea
+                                  value={edited.recommendedAction}
+                                  onChange={(e) => updateEdit(signal.id, { recommendedAction: e.target.value })}
+                                  rows={2}
+                                  className="w-full text-xs rounded-md border border-border bg-background px-2.5 py-2 text-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+                                />
+                              ) : (
+                                <p className="text-xs text-foreground">{edited.recommendedAction}</p>
                               )}
                             </div>
 
-                            {/* Recommended Action */}
-                            <div className="rounded-lg border border-[hsl(var(--accent))]/20 bg-[hsl(var(--accent))]/5 p-3">
-                              <div className="text-[10px] font-semibold text-[hsl(var(--accent))] uppercase tracking-wider mb-1">Recommended Action</div>
-                              <p className="text-xs text-foreground">{signal.recommendedAction}</p>
+                            {/* Confidence (read-only) */}
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] text-muted-foreground">AI Confidence:</span>
+                              <span className={cn(
+                                "text-[10px] font-medium px-2 py-0.5 rounded",
+                                signal.confidence === "high" ? "bg-status-success/10 text-status-success" :
+                                signal.confidence === "medium" ? "bg-status-warning/10 text-status-warning" :
+                                "bg-status-danger/10 text-status-danger"
+                              )}>
+                                {signal.confidence}
+                              </span>
                             </div>
 
                             {/* Action buttons (when pending) */}
@@ -566,7 +652,7 @@ export default function Signals() {
                                   onClick={() => handleValidate(signal.id)}
                                   className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-status-success/10 border border-status-success/20 text-status-success text-xs font-medium hover:bg-status-success/20 transition-colors"
                                 >
-                                  <ThumbsUp className="w-3.5 h-3.5" /> Validate Signal
+                                  <CheckCircle2 className="w-3.5 h-3.5" /> {hasEdits ? "Validate with Changes" : "Validate Signal"}
                                 </button>
                                 <button
                                   onClick={() => setRejectingId(rejectingId === signal.id ? null : signal.id)}
@@ -574,6 +660,14 @@ export default function Signals() {
                                 >
                                   <ThumbsDown className="w-3.5 h-3.5" /> Reject Signal
                                 </button>
+                                {hasEdits && (
+                                  <button
+                                    onClick={() => setEdits((prev) => { const next = { ...prev }; delete next[signal.id]; return next; })}
+                                    className="text-[10px] text-muted-foreground hover:text-foreground underline"
+                                  >
+                                    Reset changes
+                                  </button>
+                                )}
                               </div>
                             )}
                           </div>
