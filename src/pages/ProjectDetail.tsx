@@ -513,8 +513,8 @@ const projectsData: Record<string, {
         affectedMilestones: ["Streaming PoC", "Pipeline Migration"],
         flaggedReason: "Memory leak in vendor SDK v4.2 detected during PoC testing. 4 Slack threads over 6 days with increasing frustration. Vendor has acknowledged but no fix ETA.",
         signals: [
-          { source: "Slack", summary: "Raj reported OOM errors in streaming PoC tests — traced to SDK v4.2 memory leak", date: "Feb 24" },
-          { source: "Jira", summary: "PIPE-155 'SDK memory leak' marked as blocker with no resolution", date: "Feb 25" },
+          { source: "Slack", summary: "Raj reported OOM errors in streaming PoC tests — traced to SDK v4.2 memory leak", date: "Feb 24", quote: "Getting OOM kills after ~45 min of sustained throughput testing. Heap dump shows the SDK consumer isn't releasing message buffers. Definitely a leak in v4.2.", signalId: "sig-011" },
+          { source: "Jira", summary: "PIPE-155 'SDK memory leak' marked as blocker with no resolution", date: "Feb 25", quote: "Confirmed memory leak in vendor SDK v4.2. Vendor acknowledged on GitHub but no fix ETA. This blocks all streaming PoC work.", signalId: "sig-012" },
         ],
         sourceLinks: [
           { label: "JIRA PIPE-155 — SDK memory leak", type: "jira", url: "#" },
