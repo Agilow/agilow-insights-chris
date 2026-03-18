@@ -19,7 +19,7 @@ export interface EnhancedRisk {
   impact?: string;
   likelihood?: "high" | "medium" | "low";
   affectedMilestones?: string[];
-  signals?: { source: string; summary: string; date: string }[];
+  signals?: { source: string; summary: string; date: string; quote?: string; signalId?: string }[];
   sourceLinks?: { label: string; type: "jira" | "slack" | "email" | "meeting" | "doc"; url: string }[];
   notes?: { author: string; date: string; text: string }[];
   flaggedReason?: string;
