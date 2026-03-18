@@ -10,6 +10,7 @@ import Chat from "./pages/Chat";
 import Settings from "./pages/Settings";
 import ProjectDetail from "./pages/ProjectDetail";
 import SourceExplorer from "./pages/SourceExplorer";
+import Signals from "./pages/Signals";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

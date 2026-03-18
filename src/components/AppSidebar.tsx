@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   MessageSquare,
   BarChart3,
+  Radar,
   Settings,
   ChevronLeft,
   ChevronRight,
