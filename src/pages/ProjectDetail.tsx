@@ -348,8 +348,8 @@ const projectsData: Record<string, {
         affectedMilestones: ["Compliance Audit"],
         flaggedReason: "Legal team flagged a new GDPR requirement in an email thread that impacts token storage. This was cross-referenced with the existing architecture which stores tokens client-side.",
         signals: [
-          { source: "Email", summary: "Legal flagged new GDPR Article 17 interpretation affecting token storage", date: "Feb 25" },
-          { source: "Meeting", summary: "Compliance review meeting surfaced gap in current auth architecture", date: "Feb 24" },
+          { source: "Email", summary: "Legal flagged new GDPR Article 17 interpretation affecting token storage", date: "Feb 25", quote: "Please be advised that the recent CJEU ruling on Article 17 'right to erasure' has implications for how we store authentication tokens client-side. We need to review our current architecture.", signalId: "sig-007" },
+          { source: "Meeting", summary: "Compliance review meeting surfaced gap in current auth architecture", date: "Feb 24", quote: "Looking at our token storage approach, we're storing refresh tokens in localStorage which doesn't comply with the new interpretation. We'll need to move to httpOnly cookies at minimum.", signalId: "sig-008" },
         ],
         sourceLinks: [
           { label: "Legal email — GDPR token storage", type: "email", url: "#" },
