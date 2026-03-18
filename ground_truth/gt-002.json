@@ -1,0 +1,68 @@
+{
+  "id": "gt-002",
+
+  "context_window": {
+    "source_type": "granola",
+    "source_ref": {
+      "meeting": "Agilow Offsite (Q1 review; Q2 Planning)",
+      "date": "2026-03-14",
+      "line_range": [53, 55],
+      "participants": ["Precious", "Antonio", "Cameron", "Shaurya"]
+    },
+    "raw_content": "You missed the retro, but you can go through everyone. I asked everyone to write a self reflection on their own goals along with the yellow green. So you can do that for yourself. And you can read. But the thing for planning is here as a business goals I set for us for the week. So raise non diary defense for meginners. This is basically win mechanism. And Cameron said she's willing to take ownership of a preparation from now to Tuesday. Including. A script practice a time in coordinating, making sure we all. That's her. Although I do have something there for myself. What? You and Shaurya were the ownership is building. What I was telling Shaurya that the Chris meeting this week. Is probably as important as my Guinness. So building the dashboard, basically, and making sure that by Wednesday it's an operational condition. And if it's not, then going to plan B and making sure that we have a working prototype. On lovable, which demonstrates the value. Product. But ideally, plan a. Of course. I have to commit the database table and schema that we made yesterday. And help you. Basically, that's your ownership. Shaurya ownership is the website is down. So working with Cameron Tomato, we get the website up and also add some basic analytics on just two things. How many people are coming and how long are they staying on. The website. Then next week we can add, like, a little dialog box to collect emails. Fourth for shivam pressures is to. Something I learned from yesterday from Dave is the people we need to start talking to now. Chief internal, Chief IT Officers, chief security officers. Chief information officers because they are the ones who probably use a product and buy a product."
+  },
+
+  "signal": {
+    "raw_content": "So building the dashboard, basically, and making sure that by Wednesday it's an operational condition. And if it's not, then going to plan B and making sure that we have a working prototype.",
+    "confidence": "high",
+    "labeled_by": "antonio",
+    "labeled_at": "2026-03-18T00:00:00Z",
+    "ambiguity_flags": [
+      "'The dashboard' refers to the live pilot platform — from external context (not in transcript): the team is building a real backend + frontend connected to Granola and Slack data for the Chris demo call (source: other Granola meetings)",
+      "'Plan B' refers to falling back to the Lovable prototype — explicitly stated in the transcript ('working prototype on Lovable, which demonstrates the value')",
+      "Owner inferred from addressee — speaker is speaking directly to Antonio ('that's your ownership'), confirmed by explicit phrasing"
+    ]
+  },
+
+  "attribute_updates": [
+    {
+      "project": "agilow-demo",
+      "project_reasoning": "The signal discusses making the dashboard 'operational' for the Chris meeting and falling back to a 'working prototype on Lovable'. From external project context (not in transcript): the team has a Lovable prototype used in demo calls to show the Agilow platform to potential customers (source: other Granola meetings). The Chris meeting is a demo call with a potential customer. This maps to the agilow-demo project — the prototype and its readiness for customer-facing demos.",
+
+      "primary_attribute": "risk",
+      "primary_attribute_action": "create",
+      "primary_attribute_reasoning": "The team is explicitly discussing the possibility that the dashboard may NOT be in operational condition by Wednesday. They acknowledge uncertainty and have a contingency (plan B). This is a risk — a known possibility of a negative outcome, not yet a confirmed blocker.",
+
+      "sub_attribute_updates": [
+        {
+          "field": "summary",
+          "value": "Dashboard may not be in operational condition by Wednesday demo; plan B is falling back to Lovable prototype"
+        },
+        {
+          "field": "severity",
+          "value": "medium",
+          "reasoning": "There is already an identified plan B (the Lovable prototype), which reduces severity. If no fallback existed, this would be high. The demo can still proceed, but with a less differentiated product."
+        },
+        {
+          "field": "likelihood",
+          "value": "medium",
+          "reasoning": "Speaker frames plan B as a real possibility worth explicitly planning for, but plan A (operational dashboard) is still the goal — 'ideally, plan A of course.' Neither outcome is certain."
+        },
+        {
+          "field": "status",
+          "value": "open",
+          "reasoning": "Meeting is discussing the risk prospectively — Wednesday has not occurred yet and no subsequent signal has confirmed the risk is resolved."
+        },
+        {
+          "field": "owner",
+          "value": "antonio",
+          "reasoning": "Speaker explicitly assigns ownership: 'that's your ownership' directed at Antonio. Antonio is responsible for building the dashboard and deciding when to invoke plan B."
+        },
+        {
+          "field": "mitigation_plan",
+          "value": "Fall back to the Lovable prototype which demonstrates the product value if the live dashboard is not operational by Wednesday"
+        }
+      ]
+    }
+  ]
+}

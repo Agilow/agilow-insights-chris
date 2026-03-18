@@ -1,0 +1,62 @@
+{
+  "id": "gt-003",
+
+  "context_window": {
+    "source_type": "granola",
+    "source_ref": {
+      "meeting": "Agilow Offsite (Q1 review; Q2 Planning)",
+      "date": "2026-03-14",
+      "line_range": [86, 87],
+      "participants": ["Precious", "Antonio", "Cameron", "Shaurya"]
+    },
+    "raw_content": "So Precious is taking the lead with that. Along with a blank for two other free programs. Like Beta, which is Nvidia's inception. And Light speed. Light speed? I thought light speed was only for founders that had gone through an investment from Light Speed. So light speed, like Beta University has light speed launch program, and then that enables you to get investment from. And then what's in the City is coming up in the following week on the 24th. So Cameron is going to take lead on that. Making sure we are prepared for a 10 minute pitch. And looking at the attendees list and doing research on relevant and sending them messages before the event to make sure we have. Connections there. So, yeah, for you, the main thing, there's only one place where your name is over here. But that's pretty heavy project. Is there anything else you think is missing from the speaker that you had thought of that we need to work on? Next coming week. Okay, cool. And go ahead and start filling your plan. Are there any other upcoming programs that have deadlines in the next week? In this week? No, but then start an entrepreneurship fund. And then the NFL Draft Competition. Mark Cuban one. That's the one. April 1st. What's the first one? Tata and Entrepreneurs Fund. That's the on April 24th. So we have some time. But the sooner we apply, the better. And then pair X is on april twelveth. Okay? That's whenever we apply the batter. But I think the only thing left for us to apply to any of these programs now is a working product. When McGinnis. Yeah. For a working product will give us the confidence. Like I said, the minute. I mean, I think. I think that's the gold. The minute we start seeing value ourselves in our company, I think it's sort of over. I think we can answer all these questions. May additionally add a goal on blogging."
+  },
+
+  "signal": {
+    "raw_content": "start an entrepreneurship fund. And then the NFL Draft Competition. Mark Cuban one. That's the one. April 1st.",
+    "confidence": "high",
+    "labeled_by": "antonio",
+    "labeled_at": "2026-03-18T00:00:00Z",
+    "ambiguity_flags": [
+      "'start an entrepreneurship fund' is likely a misheard or truncated reference to the Tata and Entrepreneurs Fund mentioned moments later in the transcript — signal boundary kept as provided but note the two may be related",
+      "The competition is referred to colloquially as 'the Mark Cuban one' and 'NFL Draft Competition' — from external context (not in transcript): this is a known pitch competition associated with Mark Cuban (source: team knowledge)",
+      "Owner assigned to Precious based on context — transcript opens with 'Precious is taking the lead with that' in reference to programs/competitions; no explicit reassignment in this segment"
+    ]
+  },
+
+  "attribute_updates": [
+    {
+      "project": "agilow-accelerators",
+      "project_reasoning": "The signal discusses a pitch competition with a deadline of April 1st. From external project context (not in transcript): Agilow has an agilow-accelerators project where all programs and competitions the team is applying to are tracked (source: external agilow-accelerators context). This competition belongs there.",
+
+      "primary_attribute": "decision",
+      "primary_attribute_action": "create",
+      "primary_attribute_reasoning": "The team is identifying and committing to apply to the NFL Draft Competition (Mark Cuban one) by April 1st. The conversation moves from 'are there any other upcoming programs?' to naming this competition and affirming 'That's the one' — this is a directional commitment to pursue it, which constitutes a decision.",
+
+      "sub_attribute_updates": [
+        {
+          "field": "summary",
+          "value": "Apply to the NFL Draft Competition (Mark Cuban) by April 1st"
+        },
+        {
+          "field": "made_by",
+          "value": "precious",
+          "reasoning": "Precious is named as the lead for programs and competitions at the start of this context window ('Precious is taking the lead with that'). No explicit reassignment occurs before or in this signal."
+        },
+        {
+          "field": "made_at",
+          "value": "2026-03-14",
+          "reasoning": "Decision was made during this meeting on March 14, 2026"
+        },
+        {
+          "field": "impact",
+          "value": "Committing the team to preparing and submitting an application for a high-profile pitch competition by April 1st, approximately 2.5 weeks from the meeting date"
+        },
+        {
+          "field": "rationale",
+          "value": "Team is actively building a pipeline of accelerator programs and pitch competitions to apply to. The sooner they apply the better, and this competition has the nearest deadline among those discussed."
+        }
+      ]
+    }
+  ]
+}

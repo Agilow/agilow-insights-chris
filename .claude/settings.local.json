@@ -1,5 +1,8 @@
 {
   "permissions": {
-    "allow": []
+    "allow": [
+      "Bash(find /Users/antoniob/Documents/Agilow/agilow-insights-chris -type d -not -path */node_modules*)",
+      "Bash(find /Users/antoniob/Documents/Agilow/agilow-insights-chris -maxdepth 1 -name .*env* -o -name .env*)"
+    ]
   }
 }
