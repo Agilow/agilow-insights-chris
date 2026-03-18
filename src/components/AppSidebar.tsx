@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   MessageSquare,
   BarChart3,
+  Radar,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -16,6 +17,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { title: "Project Dashboard", icon: LayoutDashboard, path: "/" },
+  { title: "Signals", icon: Radar, path: "/signals" },
   { title: "Reports", icon: BarChart3, path: "/reports" },
   { title: "Chat", icon: MessageSquare, path: "/chat" },
 ];
