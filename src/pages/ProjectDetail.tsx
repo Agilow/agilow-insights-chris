@@ -116,8 +116,8 @@ const projectsData: Record<string, {
         affectedMilestones: ["Load Testing", "Production Deploy"],
         flaggedReason: "Repeated mentions in 3 Slack threads over 5 days with no Jira status update. DevOps capacity appears stretched across 2 other projects.",
         signals: [
-          { source: "Slack", summary: "Elena asked about load test env status 3 times in #phoenix-eng with no resolution", date: "Feb 28" },
-          { source: "Jira", summary: "PHX-201 'Provision load test env' has been in 'To Do' for 8 days", date: "Mar 1" },
+          { source: "Slack", summary: "Elena asked about load test env status 3 times in #phoenix-eng with no resolution", date: "Feb 28", quote: "Hey @lisa — any update on the load test env? We're blocked on performance testing and sprint ends Friday. This is the third time I'm asking 😬", signalId: "sig-001" },
+          { source: "Jira", summary: "PHX-201 'Provision load test env' has been in 'To Do' for 8 days", date: "Mar 1", quote: "This ticket hasn't moved in over a week. Infra team says they're stretched across Phoenix and two other projects.", signalId: "sig-002" },
         ],
         sourceLinks: [
           { label: "JIRA PHX-201 — Provision load test env", type: "jira", url: "#" },
