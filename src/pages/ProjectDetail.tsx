@@ -131,7 +131,7 @@ const projectsData: Record<string, {
         impact: "Could require 1–2 days of rework if SDK breaks during deploy window", likelihood: "low",
         flaggedReason: "SDK vendor announced breaking changes in v5.0 release notes. Current integration uses deprecated endpoints.",
         signals: [
-          { source: "Slack", summary: "James flagged SDK deprecation notice in #phoenix-eng", date: "Feb 26" },
+          { source: "Slack", summary: "James flagged SDK deprecation notice in #phoenix-eng", date: "Feb 26", quote: "Heads up — the payment SDK v5.0 release notes mention breaking changes to the checkout flow endpoints we're using. We should probably pin to v4.x.", signalId: "sig-003" },
         ],
         sourceLinks: [
           { label: "Slack thread — SDK deprecation", type: "slack", url: "#" },
