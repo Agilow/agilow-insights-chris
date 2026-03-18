@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   X, Sparkles, User, AlertTriangle, TrendingUp, TrendingDown,
   ExternalLink, Hash, TicketCheck, Mail, Video, FileText,
-  CheckCircle2, Clock, ArrowRight, Plus, Save,
+  CheckCircle2, Clock, ArrowRight, Plus, Save, Quote,
 } from "lucide-react";
 import { RiskFeedback } from "./RiskFeedback";
 
@@ -19,7 +20,7 @@ export interface EnhancedRisk {
   impact?: string;
   likelihood?: "high" | "medium" | "low";
   affectedMilestones?: string[];
-  signals?: { source: string; summary: string; date: string }[];
+  signals?: { source: string; summary: string; date: string; quote?: string; signalId?: string }[];
   sourceLinks?: { label: string; type: "jira" | "slack" | "email" | "meeting" | "doc"; url: string }[];
   notes?: { author: string; date: string; text: string }[];
   flaggedReason?: string;
@@ -58,6 +59,7 @@ interface Props {
 }
 
 export function RiskDetailDrawer({ risk, onClose }: Props) {
+  const navigate = useNavigate();
   const [newNote, setNewNote] = useState("");
   const [notes, setNotes] = useState(risk.notes || []);
   const st = statusConfig[risk.status];
@@ -165,17 +167,35 @@ export function RiskDetailDrawer({ risk, onClose }: Props) {
               <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">Key Signals</h4>
               <div className="space-y-2">
                 {risk.signals.map((sig, i) => (
-                  <div key={i} className="flex items-start gap-2.5 p-2.5 rounded-lg bg-secondary/40 border border-border/60">
-                    <div className="p-1.5 rounded-md bg-background shrink-0 mt-0.5">
-                      {sig.source === "Slack" ? <Hash className="w-3 h-3 text-accent" /> :
-                       sig.source === "Jira" ? <TicketCheck className="w-3 h-3 text-accent" /> :
-                       sig.source === "Meeting" ? <Video className="w-3 h-3 text-accent" /> :
-                       <Mail className="w-3 h-3 text-accent" />}
+                  <div key={i} className="rounded-lg bg-secondary/40 border border-border/60 overflow-hidden">
+                    <div className="flex items-start gap-2.5 p-2.5">
+                      <div className="p-1.5 rounded-md bg-background shrink-0 mt-0.5">
+                        {sig.source === "Slack" ? <Hash className="w-3 h-3 text-accent" /> :
+                         sig.source === "Jira" ? <TicketCheck className="w-3 h-3 text-accent" /> :
+                         sig.source === "Meeting" ? <Video className="w-3 h-3 text-accent" /> :
+                         <Mail className="w-3 h-3 text-accent" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-foreground font-medium">{sig.summary}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{sig.source} · {sig.date}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-foreground">{sig.summary}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">{sig.source} · {sig.date}</p>
-                    </div>
+                    {sig.quote && (
+                      <div className="mx-2.5 mb-2.5 p-2.5 rounded-md bg-background/60 border-l-2 border-accent/40">
+                        <div className="flex items-start gap-1.5">
+                          <Quote className="w-3 h-3 text-accent/60 shrink-0 mt-0.5" />
+                          <p className="text-[11px] text-muted-foreground italic leading-relaxed">"{sig.quote}"</p>
+                        </div>
+                      </div>
+                    )}
+                    {sig.signalId && (
+                      <button
+                        onClick={() => { onClose(); navigate(`/signals?highlight=${sig.signalId}`); }}
+                        className="w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-[10px] font-medium text-accent hover:bg-accent/5 border-t border-border/60 transition-colors"
+                      >
+                        View signal details <ExternalLink className="w-2.5 h-2.5" />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>

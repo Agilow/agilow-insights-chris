@@ -116,8 +116,8 @@ const projectsData: Record<string, {
         affectedMilestones: ["Load Testing", "Production Deploy"],
         flaggedReason: "Repeated mentions in 3 Slack threads over 5 days with no Jira status update. DevOps capacity appears stretched across 2 other projects.",
         signals: [
-          { source: "Slack", summary: "Elena asked about load test env status 3 times in #phoenix-eng with no resolution", date: "Feb 28" },
-          { source: "Jira", summary: "PHX-201 'Provision load test env' has been in 'To Do' for 8 days", date: "Mar 1" },
+          { source: "Slack", summary: "Elena asked about load test env status 3 times in #phoenix-eng with no resolution", date: "Feb 28", quote: "Hey @lisa — any update on the load test env? We're blocked on performance testing and sprint ends Friday. This is the third time I'm asking 😬", signalId: "sig-001" },
+          { source: "Jira", summary: "PHX-201 'Provision load test env' has been in 'To Do' for 8 days", date: "Mar 1", quote: "This ticket hasn't moved in over a week. Infra team says they're stretched across Phoenix and two other projects.", signalId: "sig-002" },
         ],
         sourceLinks: [
           { label: "JIRA PHX-201 — Provision load test env", type: "jira", url: "#" },
@@ -131,7 +131,7 @@ const projectsData: Record<string, {
         impact: "Could require 1–2 days of rework if SDK breaks during deploy window", likelihood: "low",
         flaggedReason: "SDK vendor announced breaking changes in v5.0 release notes. Current integration uses deprecated endpoints.",
         signals: [
-          { source: "Slack", summary: "James flagged SDK deprecation notice in #phoenix-eng", date: "Feb 26" },
+          { source: "Slack", summary: "James flagged SDK deprecation notice in #phoenix-eng", date: "Feb 26", quote: "Heads up — the payment SDK v5.0 release notes mention breaking changes to the checkout flow endpoints we're using. We should probably pin to v4.x.", signalId: "sig-003" },
         ],
         sourceLinks: [
           { label: "Slack thread — SDK deprecation", type: "slack", url: "#" },
@@ -209,9 +209,9 @@ const projectsData: Record<string, {
         affectedMilestones: ["Endpoint Migration", "Client SDK Update"],
         flaggedReason: "Negative sentiment detected across 5 Slack messages over 3 days. Three separate teams have reported being blocked. Jira blocker ticket remains unresolved for 10 days.",
         signals: [
-          { source: "Slack", summary: "Team Alpha, Team Beta, and Team Gamma all reported auth endpoint failures in #api-team", date: "Feb 22–25" },
-          { source: "Jira", summary: "API-410 'Auth endpoint migration' blocked — vendor docs reference deprecated API", date: "Feb 20" },
-          { source: "Email", summary: "David escalated to vendor support with no response after 5 business days", date: "Feb 23" },
+          { source: "Slack", summary: "Team Alpha, Team Beta, and Team Gamma all reported auth endpoint failures in #api-team", date: "Feb 22–25", quote: "We've been getting 401s on the /auth/token endpoint since Tuesday. Same issue as Team Beta reported. The vendor docs don't match what the API actually returns.", signalId: "sig-004" },
+          { source: "Jira", summary: "API-410 'Auth endpoint migration' blocked — vendor docs reference deprecated API", date: "Feb 20", quote: "Blocked — vendor documentation references v2 endpoints that return 404. Can't proceed with migration until updated docs are available.", signalId: "sig-005" },
+          { source: "Email", summary: "David escalated to vendor support with no response after 5 business days", date: "Feb 23", quote: "Following up on my Feb 18 email regarding the auth endpoint documentation discrepancies. Three of our teams are now blocked. Please advise on timeline for updated docs.", signalId: "sig-006" },
         ],
         sourceLinks: [
           { label: "JIRA API-410 — Auth endpoint blocked", type: "jira", url: "#" },
@@ -348,8 +348,8 @@ const projectsData: Record<string, {
         affectedMilestones: ["Compliance Audit"],
         flaggedReason: "Legal team flagged a new GDPR requirement in an email thread that impacts token storage. This was cross-referenced with the existing architecture which stores tokens client-side.",
         signals: [
-          { source: "Email", summary: "Legal flagged new GDPR Article 17 interpretation affecting token storage", date: "Feb 25" },
-          { source: "Meeting", summary: "Compliance review meeting surfaced gap in current auth architecture", date: "Feb 24" },
+          { source: "Email", summary: "Legal flagged new GDPR Article 17 interpretation affecting token storage", date: "Feb 25", quote: "Please be advised that the recent CJEU ruling on Article 17 'right to erasure' has implications for how we store authentication tokens client-side. We need to review our current architecture.", signalId: "sig-007" },
+          { source: "Meeting", summary: "Compliance review meeting surfaced gap in current auth architecture", date: "Feb 24", quote: "Looking at our token storage approach, we're storing refresh tokens in localStorage which doesn't comply with the new interpretation. We'll need to move to httpOnly cookies at minimum.", signalId: "sig-008" },
         ],
         sourceLinks: [
           { label: "Legal email — GDPR token storage", type: "email", url: "#" },
@@ -363,8 +363,8 @@ const projectsData: Record<string, {
         affectedMilestones: ["SSO Integration", "MFA Implementation"],
         flaggedReason: "Vendor notification email announced breaking API changes. Current SSO integration uses endpoints being deprecated. Timeline aligns with project's critical path.",
         signals: [
-          { source: "Email", summary: "SSO vendor announced v3 API deprecation effective March 15", date: "Feb 20" },
-          { source: "Slack", summary: "James flagged vendor timeline conflict in #auth-team", date: "Feb 21" },
+          { source: "Email", summary: "SSO vendor announced v3 API deprecation effective March 15", date: "Feb 20", quote: "We are writing to inform you that SSO Connect v3 API endpoints will be deprecated on March 15, 2025. All integrations must migrate to v4 by this date.", signalId: "sig-009" },
+          { source: "Slack", summary: "James flagged vendor timeline conflict in #auth-team", date: "Feb 21", quote: "Just saw the vendor email — they're deprecating v3 API on March 15th. That's right in the middle of our SSO integration sprint. We need to figure out if we can get early v4 access.", signalId: "sig-010" },
         ],
         sourceLinks: [
           { label: "Vendor deprecation notice", type: "email", url: "#" },
@@ -513,8 +513,8 @@ const projectsData: Record<string, {
         affectedMilestones: ["Streaming PoC", "Pipeline Migration"],
         flaggedReason: "Memory leak in vendor SDK v4.2 detected during PoC testing. 4 Slack threads over 6 days with increasing frustration. Vendor has acknowledged but no fix ETA.",
         signals: [
-          { source: "Slack", summary: "Raj reported OOM errors in streaming PoC tests — traced to SDK v4.2 memory leak", date: "Feb 24" },
-          { source: "Jira", summary: "PIPE-155 'SDK memory leak' marked as blocker with no resolution", date: "Feb 25" },
+          { source: "Slack", summary: "Raj reported OOM errors in streaming PoC tests — traced to SDK v4.2 memory leak", date: "Feb 24", quote: "Getting OOM kills after ~45 min of sustained throughput testing. Heap dump shows the SDK consumer isn't releasing message buffers. Definitely a leak in v4.2.", signalId: "sig-011" },
+          { source: "Jira", summary: "PIPE-155 'SDK memory leak' marked as blocker with no resolution", date: "Feb 25", quote: "Confirmed memory leak in vendor SDK v4.2. Vendor acknowledged on GitHub but no fix ETA. This blocks all streaming PoC work.", signalId: "sig-012" },
         ],
         sourceLinks: [
           { label: "JIRA PIPE-155 — SDK memory leak", type: "jira", url: "#" },
@@ -529,7 +529,7 @@ const projectsData: Record<string, {
         affectedMilestones: ["Streaming PoC"],
         flaggedReason: "Meeting transcript analysis shows team self-reported low Flink confidence. Combined with the SDK blocker, this creates a compounding delay risk.",
         signals: [
-          { source: "Meeting", summary: "Team retro: 'None of us have production Flink experience'", date: "Feb 22" },
+          { source: "Meeting", summary: "Team retro: 'None of us have production Flink experience'", date: "Feb 22", quote: "Honestly, none of us have run Flink in production before. We've done tutorials but the gap between that and production-grade pipelines is significant. We'd need at least two weeks to ramp up.", signalId: "sig-013" },
         ],
         sourceLinks: [
           { label: "Architecture review meeting transcript", type: "meeting", url: "#" },
