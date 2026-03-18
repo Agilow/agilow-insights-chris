@@ -529,7 +529,7 @@ const projectsData: Record<string, {
         affectedMilestones: ["Streaming PoC"],
         flaggedReason: "Meeting transcript analysis shows team self-reported low Flink confidence. Combined with the SDK blocker, this creates a compounding delay risk.",
         signals: [
-          { source: "Meeting", summary: "Team retro: 'None of us have production Flink experience'", date: "Feb 22" },
+          { source: "Meeting", summary: "Team retro: 'None of us have production Flink experience'", date: "Feb 22", quote: "Honestly, none of us have run Flink in production before. We've done tutorials but the gap between that and production-grade pipelines is significant. We'd need at least two weeks to ramp up.", signalId: "sig-013" },
         ],
         sourceLinks: [
           { label: "Architecture review meeting transcript", type: "meeting", url: "#" },
