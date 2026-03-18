@@ -30,6 +30,7 @@ const App = () => (
           <Route path="/settings" element={<Settings />} />
           <Route path="/project/:slug" element={<ProjectDetail />} />
           <Route path="/sources" element={<SourceExplorer />} />
+          <Route path="/signals" element={<Signals />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
