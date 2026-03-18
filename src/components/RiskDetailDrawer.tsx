@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   X, Sparkles, User, AlertTriangle, TrendingUp, TrendingDown,
   ExternalLink, Hash, TicketCheck, Mail, Video, FileText,
-  CheckCircle2, Clock, ArrowRight, Plus, Save,
+  CheckCircle2, Clock, ArrowRight, Plus, Save, Quote,
 } from "lucide-react";
 import { RiskFeedback } from "./RiskFeedback";
 
