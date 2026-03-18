@@ -363,8 +363,8 @@ const projectsData: Record<string, {
         affectedMilestones: ["SSO Integration", "MFA Implementation"],
         flaggedReason: "Vendor notification email announced breaking API changes. Current SSO integration uses endpoints being deprecated. Timeline aligns with project's critical path.",
         signals: [
-          { source: "Email", summary: "SSO vendor announced v3 API deprecation effective March 15", date: "Feb 20" },
-          { source: "Slack", summary: "James flagged vendor timeline conflict in #auth-team", date: "Feb 21" },
+          { source: "Email", summary: "SSO vendor announced v3 API deprecation effective March 15", date: "Feb 20", quote: "We are writing to inform you that SSO Connect v3 API endpoints will be deprecated on March 15, 2025. All integrations must migrate to v4 by this date.", signalId: "sig-009" },
+          { source: "Slack", summary: "James flagged vendor timeline conflict in #auth-team", date: "Feb 21", quote: "Just saw the vendor email — they're deprecating v3 API on March 15th. That's right in the middle of our SSO integration sprint. We need to figure out if we can get early v4 access.", signalId: "sig-010" },
         ],
         sourceLinks: [
           { label: "Vendor deprecation notice", type: "email", url: "#" },
