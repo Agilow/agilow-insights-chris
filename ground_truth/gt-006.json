@@ -1,0 +1,61 @@
+{
+  "id": "gt-006",
+
+  "context_window": {
+    "source_type": "granola",
+    "source_ref": {
+      "meeting": "Agilow Offsite (Q1 review; Q2 Planning)",
+      "date": "2026-03-14",
+      "line_range": [49, 50],
+      "participants": ["Precious", "Antonio", "Cameron", "Shaurya"]
+    },
+    "raw_content": "Me: So raise non dairy defense for meginners. This is basically win mechanism. And Cameron said she's willing to take ownership of a preparation from now to Tuesday. Including. A script practice a time in coordinating, making sure we all. That's her. Although I do have something there for myself. What? You and Shaurya were the ownership is building. What I was telling Shaurya that the Chris meeting this week. Is probably as important as my Guinness. So building the dashboard, basically, and making sure that by Wednesday it's an operational condition."
+  },
+
+  "signal": {
+    "raw_content": "And Cameron said she's willing to take ownership of a preparation from now to Tuesday.",
+    "confidence": "high",
+    "labeled_by": "antonio",
+    "labeled_at": "2026-03-20T00:00:00Z",
+    "ambiguity_flags": [
+      "'Me' is Antonio (source: team knowledge). 'Meginners' / 'non dairy defense' are speech-to-text artifacts — from external project context (not in transcript): this refers to the McGinnis pitch competition (source: project database)",
+      "'Preparation' scope is partially specified in the context window: script practice, time coordination, making sure the team is ready — but the full scope is not exhaustively listed in the transcript",
+      "'From now to Tuesday' is relative to the meeting date of 2026-03-14 (Saturday) — Tuesday resolves to 2026-03-17"
+    ]
+  },
+
+  "attribute_updates": [
+    {
+      "project": "agilow-mcginnis",
+      "project_reasoning": "The signal refers to pitch preparation ownership for a competition. From external project context (not in transcript): Agilow is participating in a pitch competition called McGinnis and has been preparing for it in the days leading up to this meeting (source: project database). 'Meginners' in the transcript is a speech-to-text artifact for 'McGinnis'.",
+
+      "primary_attribute": "task",
+      "primary_attribute_action": "create",
+      "primary_attribute_reasoning": "'Cameron said she's willing to take ownership of a preparation from now to Tuesday' is a direct ownership assignment with a deadline. The context elaborates the scope: script practice, time coordination, and ensuring the team is ready. This is a concrete deliverable with a named owner and due date — not a risk or a decision.",
+
+      "sub_attribute_updates": [
+        { "field": "summary", "value": "Cameron owns all McGinnis pitch preparation from March 14 to Tuesday March 17 — including script practice, scheduling, coordination, and team readiness" },
+        {
+          "field": "owner",
+          "value": "cameron",
+          "reasoning": "Explicitly stated in the signal: 'Cameron said she's willing to take ownership of a preparation from now to Tuesday.'"
+        },
+        {
+          "field": "due_date",
+          "value": "2026-03-17",
+          "reasoning": "'From now to Tuesday' relative to meeting date 2026-03-14 (Saturday) — Tuesday is 2026-03-17."
+        },
+        {
+          "field": "status",
+          "value": "todo",
+          "reasoning": "The ownership assignment was just made in this meeting. No signal exists that preparation work has started or that any deliverable (script, scheduling) has been completed."
+        },
+        {
+          "field": "priority",
+          "value": "high",
+          "reasoning": "From external project context (not in transcript): the McGinnis pitch competition is a high-stakes near-term event for Agilow (source: project database). Antonio frames it alongside the Chris demo as one of the two most important things happening that week. The deadline is Tuesday — three days from the meeting date."
+        }
+      ]
+    }
+  ]
+}
