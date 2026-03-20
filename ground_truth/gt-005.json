@@ -1,0 +1,60 @@
+{
+  "id": "gt-005",
+
+  "context_window": {
+    "source_type": "granola",
+    "source_ref": {
+      "meeting": "Agilow Offsite (Q1 review; Q2 Planning)",
+      "date": "2026-03-14",
+      "line_range": [21, 23],
+      "participants": ["Precious", "Antonio", "Cameron", "Shaurya"]
+    },
+    "raw_content": "Me: I much rather prefer blogs. Them: Okay? Me: Because. We can add blocks to our website. And so when someone comes to a website, gives access, credibility, like the same thing we have on a website in one blog. Also, if we start a newsletter, like a substack newsletter, where we write a blog. For next month's email update. Instead of writing this long email, we can just put a sub stack link. And we can add some pictures to us participating and some other pictures as well. So that's why I prefer to start. And also, I think fundamentally, we like. We are an academic company. We like putting information out there. And I think on LinkedIn it just gets lost in the noise. And I would rather us write like long format articles. On project management, Agilent, AI and Agile."
+  },
+
+  "signal": {
+    "raw_content": "For next month's email update. Instead of writing this long email, we can just put a sub stack link. And we can add some pictures to us participating and some other pictures as well.",
+    "confidence": "high",
+    "labeled_by": "antonio",
+    "labeled_at": "2026-03-20T00:00:00Z",
+    "ambiguity_flags": [
+      "'Me' is Antonio (source: team knowledge — Antonio is the speaker in this meeting). 'Them' is Precious, inferred from meeting context as the team member being addressed",
+      "The phrase 'next month's email update' is relative to the meeting date of 2026-03-14, meaning the target month is April 2026 — no specific date within the month is stated"
+    ]
+  },
+
+  "attribute_updates": [
+    {
+      "project": "agilow-marketing",
+      "project_reasoning": "The signal concerns replacing the team's monthly email update with a Substack link, which is a content distribution and outreach action. From external project context (not in transcript): marketing and outreach activities — including content strategy and email communications — are tracked under the agilow-marketing project scope (source: team knowledge).",
+
+      "primary_attribute": "task",
+      "primary_attribute_action": "create",
+      "primary_attribute_reasoning": "Antonio proposes a concrete action ('put a sub stack link' in the next email update) with a clear time horizon ('next month'). This is a deliverable to be executed, not a risk or a decision that has already been made — it is an intention raised in the meeting that needs to be carried out.",
+
+      "sub_attribute_updates": [
+        { "field": "summary", "value": "Replace next month's long email update with a Substack link, including photos of team participation" },
+        {
+          "field": "owner",
+          "value": "precious",
+          "reasoning": "The speaker (Antonio) is addressing Precious throughout this portion of the meeting, discussing content responsibilities. From external team context (not in transcript): Precious is the team member responsible for outreach and content execution in the agilow-marketing scope (source: team knowledge)."
+        },
+        {
+          "field": "due_date",
+          "value": "2026-04-30",
+          "reasoning": "'Next month's email update' relative to meeting date 2026-03-14 — target is April 2026. No specific day stated; end of month used as the outer bound."
+        },
+        {
+          "field": "status",
+          "value": "todo",
+          "reasoning": "This was raised in the meeting as a forward-looking intention. No signal exists that work has started or that a Substack account has been created."
+        },
+        {
+          "field": "priority",
+          "value": "low",
+          "reasoning": "Antonio states this is preferred over LinkedIn and frames it as a longer-term habit to build. The task is not blocking any immediate deliverable and the deadline ('next month') is not urgent at the time of the meeting. No urgency language or external dependency is present."
+        }
+      ]
+    }
+  ]
+}
