@@ -1,8 +1,8 @@
-# Agilow — Product Specification
+# Agilow — Product Specification (DEPRECATED)
 **Version:** 1.1
 **Date:** March 7, 2026
 **Authors:** Shiv Panjwani, Antonio B
-**Status:** Active
+**Status:** Deprected
 
 ---
 
